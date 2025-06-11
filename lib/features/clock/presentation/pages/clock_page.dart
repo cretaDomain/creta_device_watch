@@ -8,6 +8,7 @@ import 'package:creta_device_watch/features/clock/presentation/notifiers/time_no
 import 'package:creta_device_watch/features/clock/presentation/widgets/flip_digit.dart';
 import 'package:creta_device_watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:creta_device_watch/features/settings/presentation/widgets/settings_controls.dart';
+import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/pages/world_clock_page.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, listEquals;
@@ -266,11 +267,28 @@ class MainClockView extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           asyncTime.when(
-            data: (time) => Text(
-              DateFormat.yMMMMd('en_US')
-                  .add_E()
-                  .format(time), // 'yyyy년 M월 d일 (E)', 'ko_KR' -> yMMMMd('en_US').add_E()
-              style: Theme.of(context).textTheme.headlineSmall,
+            data: (time) => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  DateFormat.yMMMMd('en_US')
+                      .add_E()
+                      .format(time), // 'yyyy년 M월 d일 (E)', 'ko_KR' -> yMMMMd('en_US').add_E()
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: '오늘 있었던 역사적 사건',
+                  icon: const Icon(Icons.history),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => HistoryEventsDialog(date: time),
+                    );
+                  },
+                ),
+              ],
             ),
             loading: () => const SizedBox(height: 30),
             error: (err, stack) => const Text('Error'),

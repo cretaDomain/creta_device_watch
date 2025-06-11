@@ -24,6 +24,11 @@ import 'package:creta_device_watch/features/clock/domain/usecases/get_font.dart'
 import 'package:creta_device_watch/features/clock/domain/usecases/save_font.dart';
 import 'package:creta_device_watch/features/clock/presentation/notifiers/font_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:creta_device_watch/features/history/data/datasources/history_remote_data_source.dart';
+import 'package:creta_device_watch/features/history/data/repositories/history_repository_impl.dart';
+import 'package:creta_device_watch/features/history/domain/repositories/history_repository.dart';
+import 'package:creta_device_watch/features/history/domain/usecases/get_historical_events.dart';
 
 // --- Core ---
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) {
@@ -54,8 +59,7 @@ final fontRepositoryProvider = Provider<FontRepository>((ref) {
 
 // Use Cases
 final getTimeStreamProvider = Provider<GetTimeStream>((ref) {
-  final repository = ref.watch(timeRepositoryProvider);
-  return GetTimeStream(repository);
+  return GetTimeStream(ref.watch(timeRepositoryProvider));
 });
 
 final getFontProvider = Provider<GetFont>((ref) {
@@ -149,4 +153,21 @@ final fontProvider = StateNotifierProvider<FontNotifier, TextStyle>((ref) {
   final getFont = ref.watch(getFontProvider);
   final saveFont = ref.watch(saveFontProvider);
   return FontNotifier(getFont, saveFont);
+});
+
+// History Feature
+final dioProvider = Provider<Dio>((ref) => Dio());
+
+final historyRemoteDataSourceProvider = Provider<HistoryRemoteDataSource>((ref) {
+  return HistoryRemoteDataSourceImpl(ref.watch(dioProvider));
+});
+
+final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
+  return HistoryRepositoryImpl(
+    remoteDataSource: ref.watch(historyRemoteDataSourceProvider),
+  );
+});
+
+final getHistoricalEventsUseCaseProvider = Provider<GetHistoricalEventsUseCase>((ref) {
+  return GetHistoricalEventsUseCase(ref.watch(historyRepositoryProvider));
 });
