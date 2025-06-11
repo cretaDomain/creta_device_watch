@@ -2,7 +2,7 @@
 
 A Flutter widget to display a digital clock. This package is designed to be used as a part of the Creta devices ecosystem.
 
-![example](assets/images/digital_clock.png)
+![example](https://raw.githubusercontent.com/cretaDomain/creta_device_watch/9b76dd7f58456a68779e27f7c404e4e1e24ec92d/assets/images/digital_clock.png?token=GHSAT0AAAAAADAHVQIUO53M66Q2XATGC7JK2CJE26Q)
 
 ## Usage
 
