@@ -11,6 +11,7 @@ import 'package:creta_device_watch/features/settings/presentation/widgets/settin
 import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/pages/world_clock_page.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
+// ignore: unused_shown_name
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, listEquals;
 
 class ClockPage extends ConsumerStatefulWidget {
@@ -177,14 +178,6 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           alarmTimes: _managedAlarmTimes,
           onAddAlarm: _addAlarm,
           onDeleteAlarm: _deleteAlarm,
-          onWeather: () {
-            if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
-            if (kDebugMode) {
-              print('onWeather');
-            }
-            // final notifier = ref.read(clockViewProvider.notifier);
-            // notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
-          },
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -244,33 +237,30 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 }
 
 class MainClockView extends ConsumerWidget {
+  final double width;
+  final double height;
   final bool isAlarmRinging;
   final VoidCallback onDismissAlarm;
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
-  final VoidCallback onWeather;
-  final double width;
-  final double height;
 
   const MainClockView({
     super.key,
+    required this.width,
+    required this.height,
     this.isAlarmRinging = false,
     required this.onDismissAlarm,
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
-    required this.onWeather,
-    required this.width,
-    required this.height,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncTime = ref.watch(timeNotifierProvider);
-    final timeStream = ref.read(timeNotifierProvider.notifier).stream;
     final settings = ref.watch(settingsProvider);
     final fontStyle = ref.watch(fontProvider);
+    final asyncTime = ref.watch(timeNotifierProvider);
 
     return Center(
       child: Column(
@@ -294,10 +284,10 @@ class MainClockView extends ConsumerWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => SizedBox(
-                        width: width * 0.8,
-                        height: height * 0.9,
-                        child: HistoryEventsDialog(date: time, width: width, height: height),
+                      builder: (context) => HistoryEventsDialog(
+                        date: time,
+                        width: width,
+                        height: height,
                       ),
                     );
                   },
@@ -310,8 +300,8 @@ class MainClockView extends ConsumerWidget {
           const SizedBox(height: 20),
           // Flip Clock
           asyncTime.when(
-            data: (time) =>
-                _buildClockDisplay(context, time, timeStream, settings.timeFormat, fontStyle),
+            data: (time) => _buildClockDisplay(context, time,
+                ref.read(timeNotifierProvider.notifier).stream, settings.timeFormat, fontStyle),
             loading: () => _buildClockDisplay(
                 context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
             error: (err, stack) => const Text('Error displaying clock'),
@@ -320,11 +310,12 @@ class MainClockView extends ConsumerWidget {
           // Settings, Alarm, and Dismiss controls
           SettingsControls(
             isAlarmRinging: isAlarmRinging,
+            onDismissAlarm: onDismissAlarm,
             alarmTimes: alarmTimes,
             onAddAlarm: onAddAlarm,
             onDeleteAlarm: onDeleteAlarm,
-            onWeather: onWeather,
-            onDismissAlarm: onDismissAlarm,
+            width: width,
+            height: height,
           ),
         ],
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:creta_device_watch/core/di/provider.dart';
 import 'package:creta_device_watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:creta_device_watch/features/settings/presentation/widgets/alarm_settings_dialog.dart';
+import 'package:creta_device_watch/features/fortune_cookie/presentation/widgets/fortune_cookie_dialog.dart';
 
 class SettingsControls extends ConsumerWidget {
   final bool isAlarmRinging;
@@ -10,7 +11,8 @@ class SettingsControls extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
-  final VoidCallback onWeather;
+  final double width;
+  final double height;
 
   const SettingsControls({
     super.key,
@@ -19,7 +21,8 @@ class SettingsControls extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
-    required this.onWeather,
+    required this.width,
+    required this.height,
   });
 
   @override
@@ -97,9 +100,18 @@ class SettingsControls extends ConsumerWidget {
             ),
             const SizedBox(width: 20),
             IconButton(
-              // 날씨 버튼
-              icon: const Icon(Icons.cloud),
-              onPressed: onWeather,
+              icon: const Icon(Icons.cookie),
+              onPressed: () {
+                //final size = MediaQuery.of(context).size;
+                showDialog(
+                  context: context,
+                  builder: (context) => FortuneCookieDialog(
+                    width: width,
+                    height: height,
+                  ),
+                );
+              },
+              tooltip: '오늘의 포춘쿠키',
             ),
           ]
         ],

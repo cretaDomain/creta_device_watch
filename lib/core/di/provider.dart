@@ -31,6 +31,13 @@ import 'package:creta_device_watch/features/history/domain/repositories/history_
 import 'package:creta_device_watch/features/history/domain/usecases/get_historical_events.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../features/fortune_cookie/data/datasources/fortune_cookie_remote_data_source.dart';
+import '../../features/fortune_cookie/data/repositories/fortune_cookie_repository_impl.dart';
+import '../../features/fortune_cookie/domain/repositories/fortune_cookie_repository.dart';
+import '../../features/fortune_cookie/domain/usecases/get_fortune_cookie.dart';
+import '../../features/fortune_cookie/presentation/notifiers/fortune_cookie_notifier.dart';
+import 'package:creta_device_watch/features/fortune_cookie/domain/entities/fortune_cookie.dart';
+
 // --- Core ---
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) {
   return SharedPreferences.getInstance();
@@ -182,4 +189,29 @@ final historyRepositoryProvider = Provider<HistoryRepository>((ref) {
 
 final getHistoricalEventsUseCaseProvider = Provider<GetHistoricalEventsUseCase>((ref) {
   return GetHistoricalEventsUseCase(ref.watch(historyRepositoryProvider));
+});
+
+// --- Fortune Cookie Feature ---
+// Data Sources
+final fortuneCookieRemoteDataSourceProvider = Provider<FortuneCookieRemoteDataSource>((ref) {
+  return FortuneCookieRemoteDataSourceImpl();
+});
+
+// Repositories
+final fortuneCookieRepositoryProvider = Provider<FortuneCookieRepository>((ref) {
+  final remoteDataSource = ref.watch(fortuneCookieRemoteDataSourceProvider);
+  return FortuneCookieRepositoryImpl(remoteDataSource: remoteDataSource);
+});
+
+// Use Cases
+final getFortuneCookieUseCaseProvider = Provider<GetFortuneCookieUseCase>((ref) {
+  final repository = ref.watch(fortuneCookieRepositoryProvider);
+  return GetFortuneCookieUseCase(repository);
+});
+
+// Notifier Provider
+final fortuneCookieNotifierProvider =
+    StateNotifierProvider.autoDispose<FortuneCookieNotifier, AsyncValue<FortuneCookie?>>((ref) {
+  final getFortuneCookieUseCase = ref.watch(getFortuneCookieUseCaseProvider);
+  return FortuneCookieNotifier(getFortuneCookieUseCase);
 });
