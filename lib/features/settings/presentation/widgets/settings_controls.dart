@@ -10,7 +10,7 @@ class SettingsControls extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
-  final VoidCallback onTimeZoneChanged;
+  final VoidCallback onWeather;
 
   const SettingsControls({
     super.key,
@@ -19,7 +19,7 @@ class SettingsControls extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
-    required this.onTimeZoneChanged,
+    required this.onWeather,
   });
 
   @override
@@ -97,8 +97,9 @@ class SettingsControls extends ConsumerWidget {
             ),
             const SizedBox(width: 20),
             IconButton(
-              icon: const Icon(Icons.public),
-              onPressed: onTimeZoneChanged,
+              // 날씨 버튼
+              icon: const Icon(Icons.cloud),
+              onPressed: onWeather,
             ),
           ]
         ],

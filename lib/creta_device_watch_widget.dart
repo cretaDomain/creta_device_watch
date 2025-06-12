@@ -69,6 +69,8 @@ class CretaDeviceWatchWidget extends ConsumerWidget {
                     )
                   : null,
               child: ClockPage(
+                width: width,
+                height: height,
                 alarmTimes: alarmTimes,
               ),
             ),

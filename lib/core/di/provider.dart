@@ -29,6 +29,7 @@ import 'package:creta_device_watch/features/history/data/datasources/history_rem
 import 'package:creta_device_watch/features/history/data/repositories/history_repository_impl.dart';
 import 'package:creta_device_watch/features/history/domain/repositories/history_repository.dart';
 import 'package:creta_device_watch/features/history/domain/usecases/get_historical_events.dart';
+import 'package:flutter/foundation.dart';
 
 // --- Core ---
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) {
@@ -156,7 +157,18 @@ final fontProvider = StateNotifierProvider<FontNotifier, TextStyle>((ref) {
 });
 
 // History Feature
-final dioProvider = Provider<Dio>((ref) => Dio());
+final dioProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+  if (kDebugMode) {
+    dio.interceptors.add(LogInterceptor(
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+    ));
+  }
+  return dio;
+});
 
 final historyRemoteDataSourceProvider = Provider<HistoryRemoteDataSource>((ref) {
   return HistoryRemoteDataSourceImpl(ref.watch(dioProvider));

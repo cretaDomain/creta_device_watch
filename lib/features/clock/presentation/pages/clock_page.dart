@@ -15,10 +15,14 @@ import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, listEquals;
 
 class ClockPage extends ConsumerStatefulWidget {
   final List<String>? alarmTimes; // "YYYY/MM/DD HH:MM"
+  final double width;
+  final double height;
 
   const ClockPage({
     super.key,
     this.alarmTimes,
+    required this.width,
+    required this.height,
   });
 
   @override
@@ -166,15 +170,17 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
         body: //clockView == ClockView.main          ?
             MainClockView(
+          width: widget.width,
+          height: widget.height,
           isAlarmRinging: _isAlarmRinging,
           onDismissAlarm: _dismissAlarm,
           alarmTimes: _managedAlarmTimes,
           onAddAlarm: _addAlarm,
           onDeleteAlarm: _deleteAlarm,
-          onTimeZoneChanged: () {
+          onWeather: () {
             if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
             if (kDebugMode) {
-              print('onTimeZoneChanged');
+              print('onWeather');
             }
             // final notifier = ref.read(clockViewProvider.notifier);
             // notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
@@ -243,7 +249,9 @@ class MainClockView extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
-  final VoidCallback onTimeZoneChanged;
+  final VoidCallback onWeather;
+  final double width;
+  final double height;
 
   const MainClockView({
     super.key,
@@ -252,7 +260,9 @@ class MainClockView extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
-    required this.onTimeZoneChanged,
+    required this.onWeather,
+    required this.width,
+    required this.height,
   });
 
   @override
@@ -284,7 +294,11 @@ class MainClockView extends ConsumerWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => HistoryEventsDialog(date: time),
+                      builder: (context) => SizedBox(
+                        width: width * 0.8,
+                        height: height * 0.9,
+                        child: HistoryEventsDialog(date: time, width: width, height: height),
+                      ),
                     );
                   },
                 ),
@@ -309,7 +323,7 @@ class MainClockView extends ConsumerWidget {
             alarmTimes: alarmTimes,
             onAddAlarm: onAddAlarm,
             onDeleteAlarm: onDeleteAlarm,
-            onTimeZoneChanged: onTimeZoneChanged,
+            onWeather: onWeather,
             onDismissAlarm: onDismissAlarm,
           ),
         ],

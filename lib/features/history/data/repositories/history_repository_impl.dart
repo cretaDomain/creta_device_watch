@@ -16,6 +16,7 @@ class HistoryRepositoryImpl implements HistoryRepository {
                 year: dto.year,
                 text: dto.text,
                 imageUrl: dto.imageUrl,
+                translatedText: null,
               ))
           .toList();
     } catch (e) {

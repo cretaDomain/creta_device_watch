@@ -5,8 +5,11 @@ import 'package:creta_device_watch/features/history/presentation/notifiers/histo
 
 class HistoryEventsDialog extends ConsumerWidget {
   final DateTime date;
+  final double width;
+  final double height;
 
-  const HistoryEventsDialog({super.key, required this.date});
+  const HistoryEventsDialog(
+      {super.key, required this.date, required this.width, required this.height});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,8 +18,8 @@ class HistoryEventsDialog extends ConsumerWidget {
     return AlertDialog(
       title: Text('${DateFormat.MMMMd('ko_KR').format(date)}, 역사 속 오늘'),
       content: SizedBox(
-        width: double.maxFinite,
-        height: 400,
+        width: width * 0.6,
+        height: height * 0.5,
         child: historyState.when(
           data: (events) {
             if (events.isEmpty) {
@@ -70,7 +73,21 @@ class HistoryEventsDialog extends ConsumerWidget {
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                               const SizedBox(height: 4),
-                              Text(event.text),
+                              Text(event.translatedText ?? event.text),
+                              if (event.translatedText == null) ...[
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(historyNotifierProvider(date).notifier)
+                                          .translateEvent(index);
+                                    },
+                                    child: const Text('번역하기'),
+                                  ),
+                                ),
+                              ]
                             ],
                           ),
                         ),
