@@ -27,4 +27,9 @@ class SettingsNotifier extends StateNotifier<ClockSettings> {
     state = newSettings;
     await _saveSettings(newSettings);
   }
+
+  Future<void> toggleFlipped() async {
+    state = state.copyWith(isFlipped: !state.isFlipped);
+    await _saveSettings(state);
+  }
 }

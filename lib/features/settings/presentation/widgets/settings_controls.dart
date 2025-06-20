@@ -113,6 +113,14 @@ class SettingsControls extends ConsumerWidget {
               },
               tooltip: '오늘의 포춘쿠키',
             ),
+            const SizedBox(width: 20),
+            IconButton(
+              icon: const Icon(Icons.screen_rotation_outlined),
+              onPressed: () {
+                settingsNotifier.toggleFlipped();
+              },
+              tooltip: '화면 180도 회전',
+            ),
           ]
         ],
       ),

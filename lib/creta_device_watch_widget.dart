@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -54,24 +56,27 @@ class CretaDeviceWatchWidget extends ConsumerWidget {
     return sharedPreferencesAsync.when(
       data: (_) {
         final settings = ref.watch(settingsProvider);
-        return MaterialApp(
-          title: 'Digital Clock',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: settings.themeMode,
-          home: Center(
-            child: Container(
-              width: width,
-              height: height,
-              decoration: showBorder
-                  ? BoxDecoration(
-                      border: Border.all(color: Colors.blue, width: 10),
-                    )
-                  : null,
-              child: ClockPage(
+        return Transform.rotate(
+          angle: settings.isFlipped ? pi : 0,
+          child: MaterialApp(
+            title: 'Digital Clock',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: settings.themeMode,
+            home: Center(
+              child: Container(
                 width: width,
                 height: height,
-                alarmTimes: alarmTimes,
+                decoration: showBorder
+                    ? BoxDecoration(
+                        border: Border.all(color: Colors.blue, width: 10),
+                      )
+                    : null,
+                child: ClockPage(
+                  width: width,
+                  height: height,
+                  alarmTimes: alarmTimes,
+                ),
               ),
             ),
           ),
