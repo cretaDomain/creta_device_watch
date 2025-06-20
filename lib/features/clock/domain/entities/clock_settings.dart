@@ -6,7 +6,7 @@ enum TimeFormat { h12, h24 }
 class ClockSettings {
   const ClockSettings({
     this.timeFormat = TimeFormat.h24,
-    this.themeMode = ThemeMode.system,
+    this.themeMode = ThemeMode.dark,
     this.isFlipped = false,
   });
 
