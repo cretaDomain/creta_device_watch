@@ -32,4 +32,9 @@ class SettingsNotifier extends StateNotifier<ClockSettings> {
     state = state.copyWith(isFlipped: !state.isFlipped);
     await _saveSettings(state);
   }
+
+  Future<void> toggleWeatherFeature() async {
+    state = state.copyWith(isWeatherEnabled: !state.isWeatherEnabled);
+    await _saveSettings(state);
+  }
 }

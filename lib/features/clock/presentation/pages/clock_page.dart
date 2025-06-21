@@ -167,8 +167,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 
   @override
   Widget build(BuildContext context) {
-    //final clockView = ref.watch(clockViewProvider);
-
+    final settings = ref.watch(settingsProvider);
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
         body: //clockView == ClockView.main          ?
@@ -191,10 +190,10 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         //   ),
         );
 
-    if (!_isWebAudioReady) {
-      return Stack(
-        children: [
-          pageContent,
+    return Stack(
+      children: [
+        //if (settings.isWeatherEnabled) const WeatherBackground(),
+        if (!_isWebAudioReady)
           Positioned.fill(
             child: LayoutBuilder(builder: (context, constraints) {
               final bodyHeight = constraints.maxHeight - MediaQuery.of(context).padding.top;
@@ -231,10 +230,9 @@ class _ClockPageState extends ConsumerState<ClockPage> {
               );
             }),
           ),
-        ],
-      );
-    }
-    return pageContent;
+        pageContent,
+      ],
+    );
   }
 }
 
@@ -267,7 +265,7 @@ class MainClockView extends ConsumerWidget {
     return Center(
       child: Stack(
         children: [
-          const WeatherBackground(),
+          if (settings.isWeatherEnabled) const WeatherBackground(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

@@ -237,5 +237,8 @@ final getWeatherProvider = Provider<GetWeather>((ref) {
 });
 
 final weatherProvider = StateNotifierProvider<WeatherNotifier, WeatherState>((ref) {
-  return WeatherNotifier(ref.watch(getWeatherProvider));
+  final getWeather = ref.watch(getWeatherProvider);
+  final isWeatherEnabled =
+      ref.watch(settingsProvider.select((settings) => settings.isWeatherEnabled));
+  return WeatherNotifier(getWeather, isWeatherEnabled);
 });

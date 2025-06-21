@@ -121,6 +121,16 @@ class SettingsControls extends ConsumerWidget {
               },
               tooltip: '화면 180도 회전',
             ),
+            const SizedBox(width: 20),
+            IconButton(
+              icon: Icon(
+                settings.isWeatherEnabled ? Icons.cloud : Icons.cloud_off,
+              ),
+              onPressed: () {
+                settingsNotifier.toggleWeatherFeature();
+              },
+              tooltip: '날씨 보기 ${settings.isWeatherEnabled ? '끄기' : '켜기'}',
+            ),
           ]
         ],
       ),
