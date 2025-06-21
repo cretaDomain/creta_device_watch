@@ -350,7 +350,8 @@ class MainClockView extends ConsumerWidget {
 
     const digitWidth = 120.0;
     const digitHeight = 180.0;
-    final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.2);
+    final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.8);
+    //final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -127,7 +127,8 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
         weatherState.error == null;
 
     return Stack(
-      fit: StackFit.expand,
+      //fit: StackFit.expand,
+      alignment: Alignment.centerLeft,
       children: [
         if (showVideo)
           SizedBox.expand(
@@ -150,17 +151,20 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
   }
 
   Widget _buildWeatherOverlay(Weather weather) {
-    return Positioned(
-      bottom: 20,
-      left: 20,
+    return Padding(
+      padding: const EdgeInsets.only(left: 20.0),
       child: Container(
+        width: 150,
+        height: 150,
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(10),
+          color: Colors.black.withValues(alpha: 0.3),
+          shape: BoxShape.circle,
+          //borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               '${weather.temperature.round()}°C',

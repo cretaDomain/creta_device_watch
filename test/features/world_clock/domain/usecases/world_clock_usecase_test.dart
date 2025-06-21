@@ -44,7 +44,7 @@ void main() {
     deleteWorldCity = DeleteWorldCity(fakeWorldClockRepository);
   });
 
-  final tCity = WorldCity(id: '1', city: 'Test City', timezone: 'Test/Zone');
+  const tCity = WorldCity(id: '1', city: 'Test City', timezone: 'Test/Zone');
 
   group('GetWorldCities', () {
     test('should get list of cities from the repository', () async {
