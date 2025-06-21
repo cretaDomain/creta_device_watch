@@ -30,6 +30,13 @@ import 'package:creta_device_watch/features/history/data/repositories/history_re
 import 'package:creta_device_watch/features/history/domain/repositories/history_repository.dart';
 import 'package:creta_device_watch/features/history/domain/usecases/get_historical_events.dart';
 import 'package:flutter/foundation.dart';
+import 'package:creta_device_watch/features/weather/data/datasources/weather_remote_data_source.dart';
+import 'package:creta_device_watch/features/weather/data/repositories/weather_repository_impl.dart';
+import 'package:creta_device_watch/features/weather/domain/repositories/weather_repository.dart';
+import 'package:creta_device_watch/features/weather/domain/usecases/get_weather.dart';
+import 'package:creta_device_watch/features/weather/presentation/notifiers/weather_notifier.dart';
+import 'package:creta_device_watch/features/weather/presentation/notifiers/weather_state.dart';
+import 'package:http/http.dart' as http;
 
 import '../../features/fortune_cookie/data/datasources/fortune_cookie_remote_data_source.dart';
 import '../../features/fortune_cookie/data/repositories/fortune_cookie_repository_impl.dart';
@@ -214,4 +221,19 @@ final fortuneCookieNotifierProvider =
     StateNotifierProvider.autoDispose<FortuneCookieNotifier, AsyncValue<FortuneCookie?>>((ref) {
   final getFortuneCookieUseCase = ref.watch(getFortuneCookieUseCaseProvider);
   return FortuneCookieNotifier(getFortuneCookieUseCase);
+});
+
+// Weather Feature Providers
+final weatherRepositoryProvider = Provider<WeatherRepository>((ref) {
+  return WeatherRepositoryImpl(
+    remoteDataSource: WeatherRemoteDataSourceImpl(client: http.Client()),
+  );
+});
+
+final getWeatherProvider = Provider<GetWeather>((ref) {
+  return GetWeather(ref.watch(weatherRepositoryProvider));
+});
+
+final weatherProvider = StateNotifierProvider<WeatherNotifier, WeatherState>((ref) {
+  return WeatherNotifier(ref.watch(getWeatherProvider));
 });
