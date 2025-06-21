@@ -14,6 +14,8 @@ import 'package:creta_device_watch/features/history/presentation/widgets/history
 // ignore: unused_shown_name
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, listEquals;
 
+import '../../../weather/presentation/widgets/weather_background.dart';
+
 class ClockPage extends ConsumerStatefulWidget {
   final List<String>? alarmTimes; // "YYYY/MM/DD HH:MM"
   final double width;
@@ -192,6 +194,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     if (!_isWebAudioReady) {
       return Stack(
         children: [
+          //const WeatherBackground(),
           pageContent,
           Positioned.fill(
             child: LayoutBuilder(builder: (context, constraints) {
@@ -232,7 +235,12 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         ],
       );
     }
-    return pageContent;
+    return Stack(
+      children: [
+        //const WeatherBackground(),
+        pageContent,
+      ],
+    );
   }
 }
 
@@ -263,59 +271,64 @@ class MainClockView extends ConsumerWidget {
     final asyncTime = ref.watch(timeNotifierProvider);
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          asyncTime.when(
-            data: (time) => Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  DateFormat.yMMMMd('en_US')
-                      .add_E()
-                      .format(time), // 'yyyy년 M월 d일 (E)', 'ko_KR' -> yMMMMd('en_US').add_E()
-                  style: Theme.of(context).textTheme.headlineSmall,
+          const WeatherBackground(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              asyncTime.when(
+                data: (time) => Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      DateFormat.yMMMMd('en_US')
+                          .add_E()
+                          .format(time), // 'yyyy년 M월 d일 (E)', 'ko_KR' -> yMMMMd('en_US').add_E()
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      tooltip: '오늘 있었던 역사적 사건',
+                      icon: const Icon(Icons.history),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => HistoryEventsDialog(
+                            date: time,
+                            width: width,
+                            height: height,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  tooltip: '오늘 있었던 역사적 사건',
-                  icon: const Icon(Icons.history),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => HistoryEventsDialog(
-                        date: time,
-                        width: width,
-                        height: height,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            loading: () => const SizedBox(height: 30),
-            error: (err, stack) => const Text('Error'),
-          ),
-          const SizedBox(height: 20),
-          // Flip Clock
-          asyncTime.when(
-            data: (time) => _buildClockDisplay(context, time,
-                ref.read(timeNotifierProvider.notifier).stream, settings.timeFormat, fontStyle),
-            loading: () => _buildClockDisplay(
-                context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
-            error: (err, stack) => const Text('Error displaying clock'),
-          ),
-          const SizedBox(height: 20),
-          // Settings, Alarm, and Dismiss controls
-          SettingsControls(
-            isAlarmRinging: isAlarmRinging,
-            onDismissAlarm: onDismissAlarm,
-            alarmTimes: alarmTimes,
-            onAddAlarm: onAddAlarm,
-            onDeleteAlarm: onDeleteAlarm,
-            width: width,
-            height: height,
+                loading: () => const SizedBox(height: 30),
+                error: (err, stack) => const Text('Error'),
+              ),
+              const SizedBox(height: 20),
+              // Flip Clock
+              asyncTime.when(
+                data: (time) => _buildClockDisplay(context, time,
+                    ref.read(timeNotifierProvider.notifier).stream, settings.timeFormat, fontStyle),
+                loading: () => _buildClockDisplay(
+                    context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
+                error: (err, stack) => const Text('Error displaying clock'),
+              ),
+              const SizedBox(height: 20),
+              // Settings, Alarm, and Dismiss controls
+              SettingsControls(
+                isAlarmRinging: isAlarmRinging,
+                onDismissAlarm: onDismissAlarm,
+                alarmTimes: alarmTimes,
+                onAddAlarm: onAddAlarm,
+                onDeleteAlarm: onDeleteAlarm,
+                width: width,
+                height: height,
+              ),
+            ],
           ),
         ],
       ),
@@ -341,8 +354,8 @@ class MainClockView extends ConsumerWidget {
 
     final textStyle = fontStyle.copyWith(color: textColor);
 
-    final digitWidth = 120.0;
-    final digitHeight = 180.0;
+    const digitWidth = 120.0;
+    const digitHeight = 180.0;
     final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Row(

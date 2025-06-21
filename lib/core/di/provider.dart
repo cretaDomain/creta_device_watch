@@ -90,12 +90,14 @@ final saveFontProvider = Provider<SaveFont>((ref) {
 // --- Presentation ---
 
 // Time Stream Provider for the UI
-/*
 final timeStreamProvider = StreamProvider<DateTime>((ref) {
   final getTimeStream = ref.watch(getTimeStreamProvider);
   return getTimeStream();
 });
-*/
+
+final timeProvider = Provider<DateTime>((ref) {
+  return ref.watch(timeStreamProvider).asData?.value ?? DateTime.now();
+});
 
 // --- Settings Feature ---
 

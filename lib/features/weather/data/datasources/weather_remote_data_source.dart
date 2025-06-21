@@ -14,6 +14,7 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
 
   @override
   Future<WeatherModel> getWeather(String cityName) async {
+    print('getWeather $cityName $openWeatherApiKey');
     final uri = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$openWeatherApiKey&units=metric');
 
@@ -23,9 +24,11 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
     );
 
     if (response.statusCode == 200) {
+      print('response.body: ${response.body}');
       return WeatherModel.fromJson(json.decode(response.body));
     } else {
       // You can define custom exceptions for different error cases
+      print('response.statusCode: ${response.statusCode}');
       throw Exception('Failed to load weather data');
     }
   }
