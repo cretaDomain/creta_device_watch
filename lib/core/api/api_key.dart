@@ -8,7 +8,7 @@ const String copilotEndpoint = String.fromEnvironment('COPILOT_ENDPOINT');
 
 // 실제 OpenWeatherMap API 키로 교체해주세요.
 // 이 파일은 .gitignore에 추가하여 버전 관리에서 제외하는 것을 권장합니다.
-const String openWeatherApiKey = 'YOUR_API_KEY';
+const String openWeatherApiKey = 'e4546da9f3ecbd831d86bc365750f5ec';
 
 void checkApiKeys() {
   if (aiProvider == 'Gemini' && geminiApiKey.isEmpty) {
