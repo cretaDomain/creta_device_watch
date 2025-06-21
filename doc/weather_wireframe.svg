@@ -15,24 +15,26 @@
     <text x="0" y="150" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="#555">Clear</text>
   </g>
 
-  <!-- Detailed Info (Right Side) -->
-  <g transform="translate(1200, 150)" font-family="Arial, sans-serif" font-size="32" fill="#333">
+  <!-- Detailed Info (Right Side) - Infographic Style -->
+  <g transform="translate(1200, 120)" font-family="Arial, sans-serif" font-size="32" fill="#333">
     <!-- High/Low Temperature -->
-    <text x="0" y="0">
-      <tspan font-weight="bold">High/Low:</tspan> 25°C / 18°C
-    </text>
+    <text x="0" y="0"><tspan font-size="40">⬆️</tspan> High: 25°C</text>
+    <text x="0" y="60"><tspan font-size="40">⬇️</tspan> Low: 18°C</text>
+    
     <!-- Precipitation -->
-    <text x="0" y="80">
-      <tspan font-weight="bold">Precipitation:</tspan> 0 mm
-    </text>
+    <text x="0" y="140"><tspan font-size="40">💧</tspan> Precipitation: 0 mm</text>
+    
     <!-- Wind -->
-    <text x="0" y="160">
-      <tspan font-weight="bold">Wind:</tspan> 5 m/s, NW
-    </text>
-    <!-- Wind Icon (Placeholder) -->
-    <text x="300" y="160" font-size="40">↗️</text>
+    <g transform="translate(0, 220)">
+        <text><tspan font-size="40">༄</tspan> Wind: 5 m/s</text>
+        <!-- Wind Vane Icon (direction: NW) -->
+        <g transform="translate(280, -15) scale(1.5)">
+            <path d="M0 -15 L-10 5 L0 -5 L10 5 Z" fill="#333" transform="rotate(-45)"/>
+            <line x1="0" y1="-5" x2="0" y2="10" stroke="#333" stroke-width="2"/>
+        </g>
+    </g>
   </g>
 
   <!-- Title/Note -->
-  <text x="960" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#666">Full Screen Weather Display Wireframe (1920x480)</text>
+  <text x="960" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#666">Full Screen Weather Display Wireframe (Infographic Style)</text>
 </svg> 
