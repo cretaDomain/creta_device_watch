@@ -167,6 +167,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: unused_local_variable
     final settings = ref.watch(settingsProvider);
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
