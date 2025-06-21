@@ -1,0 +1,38 @@
+<svg width="1920" height="480" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: This area will be a video based on the weather condition. -->
+  <rect width="1920" height="480" fill="#e0f7fa" />
+
+  <!-- Wireframe Outline -->
+  <rect width="1920" height="480" fill="none" stroke="#333" stroke-width="2"/>
+
+  <!-- Main Info (Left Side) -->
+  <g transform="translate(400, 240)">
+    <!-- Current Temperature -->
+    <text x="0" y="-30" font-family="Arial, sans-serif" font-size="120" font-weight="bold" text-anchor="middle" fill="#333">23°C</text>
+    <!-- Weather Icon (Placeholder) -->
+    <text x="0" y="80" font-family="Arial, sans-serif" font-size="80" text-anchor="middle" fill="#333">☀️</text>
+    <!-- Weather Condition Text -->
+    <text x="0" y="150" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="#555">Clear</text>
+  </g>
+
+  <!-- Detailed Info (Right Side) -->
+  <g transform="translate(1200, 150)" font-family="Arial, sans-serif" font-size="32" fill="#333">
+    <!-- High/Low Temperature -->
+    <text x="0" y="0">
+      <tspan font-weight="bold">High/Low:</tspan> 25°C / 18°C
+    </text>
+    <!-- Precipitation -->
+    <text x="0" y="80">
+      <tspan font-weight="bold">Precipitation:</tspan> 0 mm
+    </text>
+    <!-- Wind -->
+    <text x="0" y="160">
+      <tspan font-weight="bold">Wind:</tspan> 5 m/s, NW
+    </text>
+    <!-- Wind Icon (Placeholder) -->
+    <text x="300" y="160" font-size="40">↗️</text>
+  </g>
+
+  <!-- Title/Note -->
+  <text x="960" y="40" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#666">Full Screen Weather Display Wireframe (1920x480)</text>
+</svg> 
