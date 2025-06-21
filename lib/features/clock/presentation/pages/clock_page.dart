@@ -194,7 +194,6 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     if (!_isWebAudioReady) {
       return Stack(
         children: [
-          //const WeatherBackground(),
           pageContent,
           Positioned.fill(
             child: LayoutBuilder(builder: (context, constraints) {
@@ -235,12 +234,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         ],
       );
     }
-    return Stack(
-      children: [
-        //const WeatherBackground(),
-        pageContent,
-      ],
-    );
+    return pageContent;
   }
 }
 
@@ -356,7 +350,7 @@ class MainClockView extends ConsumerWidget {
 
     const digitWidth = 120.0;
     const digitHeight = 180.0;
-    final digitBackgroundColor = Theme.of(context).colorScheme.surface;
+    final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.2);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
