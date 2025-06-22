@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:creta_device_watch/core/di/provider.dart';
 import 'package:creta_device_watch/features/weather/domain/entities/weather.dart';
+import 'package:intl/intl.dart';
 
 class WeatherBackground extends ConsumerStatefulWidget {
   const WeatherBackground({super.key});
@@ -179,7 +181,7 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
             ),
             const SizedBox(height: 4),
             Text(
-              weather.lastUpdated.toString(),
+              DateFormat('MM-dd HH:mm').format(weather.lastUpdated),
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           ],
@@ -237,19 +239,17 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Wind',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
+            const Icon(Icons.air, color: Colors.white, size: 40),
+            const SizedBox(height: 4),
             Text(
               '${weather.windSpeed} m/s',
               style:
                   const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 4),
-            Text(
-              '${weather.windDirection}',
-              style: const TextStyle(fontSize: 16, color: Colors.white),
+            Transform.rotate(
+              angle: (weather.windDirection + 180) * math.pi / 180,
+              child: const Icon(Icons.navigation, color: Colors.white, size: 24),
             ),
           ],
         ),
@@ -273,17 +273,30 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 4),
-            Text(
-              'Rain:${weather.rainVolume ?? 0.0}',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.water_drop, color: Colors.white, size: 30),
+                const SizedBox(width: 8),
+                Text(
+                  ' ${weather.rainVolume ?? 0.0}',
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Snow:${weather.snowVolume ?? 0.0}',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.ac_unit, color: Colors.white, size: 30),
+                const SizedBox(width: 8),
+                Text(
+                  ' ${weather.snowVolume ?? 0.0}',
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+              ],
             ),
           ],
         ),
