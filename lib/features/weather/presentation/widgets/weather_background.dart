@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,7 +59,6 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
       setState(() {
         _videosInitialized = true;
       });
-      // Set initial video if weather is already available
       _updateActiveController(ref.read(weatherProvider).weather);
     }
   }
@@ -129,8 +129,6 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
         weatherState.error == null;
 
     return Stack(
-      //fit: StackFit.expand,
-      alignment: Alignment.centerLeft,
       children: [
         if (showVideo)
           SizedBox.expand(
@@ -147,160 +145,109 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
           fallbackWidget,
         if (weatherState.isLoading) const Center(child: CircularProgressIndicator()),
         if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
-          _buildWeatherOverlayLeftCity(weatherState.weather!),
-        if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
-          _buildWeatherOverlayLeft(weatherState.weather!),
-        if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
-          _buildWeatherOverlayRight(weatherState.weather!),
-        if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
-          _buildWeatherOverlayRainOrSnow(weatherState.weather!),
+          _buildWeatherInfoPanel(weatherState.weather!),
       ],
     );
   }
 
-  Widget _buildWeatherOverlayLeftCity(Weather weather) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0),
-      child: Container(
-        width: 150,
-        height: 150,
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
-          //borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              weather.cityName,
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              DateFormat('MM-dd HH:mm').format(weather.lastUpdated),
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWeatherOverlayLeft(Weather weather) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0 + 150 + 20),
-      child: Container(
-        width: 150,
-        height: 150,
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
-          //borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '${weather.temperature.round()}°C',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${weather.tempMin} ~ ${weather.tempMax}°C',
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWeatherOverlayRight(Weather weather) {
+  Widget _buildWeatherInfoPanel(Weather weather) {
+    final textTheme = Theme.of(context).textTheme;
+    const textColor = Colors.white;
     return Positioned(
+      bottom: 20,
+      left: 20,
       right: 20,
-      bottom: (480 - 150) / 2 - 32,
-      child: Container(
-        width: 150,
-        height: 150,
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
-          //borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.air, color: Colors.white, size: 40),
-            const SizedBox(height: 4),
-            Text(
-              '${weather.windSpeed} m/s',
-              style:
-                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(0.2)),
             ),
-            const SizedBox(height: 4),
-            Transform.rotate(
-              angle: (weather.windDirection + 180) * math.pi / 180,
-              child: const Icon(Icons.navigation, color: Colors.white, size: 24),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildMainWeatherInfo(weather, textColor),
+                _buildDetailedWeatherInfo(weather, textColor, textTheme),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildWeatherOverlayRainOrSnow(Weather weather) {
-    return Positioned(
-      right: 20 + 150 + 20,
-      bottom: (480 - 150) / 2 - 32,
-      child: Container(
-        width: 150,
-        height: 150,
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
-          shape: BoxShape.circle,
+  Widget _buildMainWeatherInfo(Weather weather, Color textColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${weather.temperature.round()}°',
+          style: TextStyle(
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+            color: textColor,
+            height: 1.1,
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.water_drop, color: Colors.white, size: 30),
-                const SizedBox(width: 8),
-                Text(
-                  ' ${weather.rainVolume ?? 0.0}',
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.ac_unit, color: Colors.white, size: 30),
-                const SizedBox(width: 8),
-                Text(
-                  ' ${weather.snowVolume ?? 0.0}',
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-              ],
-            ),
-          ],
+        Text(
+          '${weather.tempMin.round()}° / ${weather.tempMax.round()}°',
+          style: TextStyle(fontSize: 16, color: textColor.withOpacity(0.8)),
         ),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          weather.cityName,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: textColor),
+        ),
+        Text(
+          DateFormat('MM-dd HH:mm').format(weather.lastUpdated),
+          style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.8)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailedWeatherInfo(Weather weather, Color textColor, TextTheme textTheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _buildInfoRow(
+          Icons.air,
+          '${weather.windSpeed} m/s',
+          textColor,
+          extra: Transform.rotate(
+            angle: (weather.windDirection + 180) * math.pi / 180,
+            child: Icon(Icons.navigation, color: textColor, size: 16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _buildInfoRow(
+          Icons.water_drop_outlined,
+          '${weather.rainVolume?.toStringAsFixed(1) ?? "0.0"} mm',
+          textColor,
+        ),
+        const SizedBox(height: 8),
+        _buildInfoRow(
+          Icons.ac_unit_outlined,
+          '${weather.snowVolume?.toStringAsFixed(1) ?? "0.0"} mm',
+          textColor,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, Color color, {Widget? extra}) {
+    return Row(
+      children: [
+        if (extra != null) ...[extra, const SizedBox(width: 4)],
+        Icon(icon, color: color, size: 16),
+        const SizedBox(width: 8),
+        Text(text, style: TextStyle(color: color, fontSize: 16)),
+      ],
     );
   }
 }
