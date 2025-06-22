@@ -145,12 +145,14 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
           fallbackWidget,
         if (weatherState.isLoading) const Center(child: CircularProgressIndicator()),
         if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
-          _buildWeatherOverlay(weatherState.weather!),
+          _buildWeatherOverlayLeft(weatherState.weather!),
+        if (weatherState.weather != null && !weatherState.isLoading && weatherState.error == null)
+          _buildWeatherOverlayRight(weatherState.weather!),
       ],
     );
   }
 
-  Widget _buildWeatherOverlay(Weather weather) {
+  Widget _buildWeatherOverlayLeft(Weather weather) {
     return Padding(
       padding: const EdgeInsets.only(left: 20.0),
       child: Container(
@@ -173,7 +175,44 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Wind: ${weather.windSpeed} m/s',
+              '${weather.tempMin} ~ ${weather.tempMax}°C',
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeatherOverlayRight(Weather weather) {
+    return Positioned(
+      right: 20,
+      bottom: (480 - 150) / 2 - 32,
+      child: Container(
+        width: 150,
+        height: 150,
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.3),
+          shape: BoxShape.circle,
+          //borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Wind',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            Text(
+              '${weather.windSpeed} m/s',
+              style:
+                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${weather.windDirection}',
               style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           ],
