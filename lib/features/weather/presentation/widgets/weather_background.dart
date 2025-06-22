@@ -164,9 +164,9 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.25),
+              color: Colors.black.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,7 +196,7 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
         ),
         Text(
           '${weather.tempMin.round()}° / ${weather.tempMax.round()}°',
-          style: TextStyle(fontSize: 16, color: textColor.withOpacity(0.8)),
+          style: TextStyle(fontSize: 16, color: textColor.withValues(alpha: 0.8)),
         ),
         const SizedBox(height: 8),
         Text(
@@ -205,7 +205,7 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
         ),
         Text(
           DateFormat('MM-dd HH:mm').format(weather.lastUpdated),
-          style: TextStyle(fontSize: 14, color: textColor.withOpacity(0.8)),
+          style: TextStyle(fontSize: 14, color: textColor.withValues(alpha: 0.8)),
         ),
       ],
     );

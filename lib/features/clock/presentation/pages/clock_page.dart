@@ -9,6 +9,7 @@ import 'package:creta_device_watch/features/clock/presentation/widgets/flip_digi
 import 'package:creta_device_watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:creta_device_watch/features/settings/presentation/widgets/settings_controls.dart';
 import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
+import 'package:creta_device_watch/features/clock/presentation/widgets/alarm_video_player.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/pages/world_clock_page.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 // ignore: unused_shown_name
@@ -134,12 +135,12 @@ class _ClockPageState extends ConsumerState<ClockPage> {
       _isAlarmRinging = true;
     });
 
-    if (_isWebAudioReady) {
-      // NOTE: User must add a sound file to `assets/sounds/`
-      // Example: `assets/sounds/alarm.m4a`
-      await _audioPlayer.play(AssetSource('sounds/alarm.mp3'), volume: 1.0);
-      _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    }
+    // if (_isWebAudioReady) {
+    //   // NOTE: User must add a sound file to `assets/sounds/`
+    //   // Example: `assets/sounds/alarm.m4a`
+    //   await _audioPlayer.play(AssetSource('sounds/alarm.mp3'), volume: 1.0);
+    //   _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    // }
 
     _alarmTimeout = Timer(const Duration(seconds: 30), () {
       _dismissAlarm();
@@ -148,7 +149,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 
   void _dismissAlarm() {
     _alarmTimeout?.cancel();
-    _audioPlayer.stop();
+    // _audioPlayer.stop();
     if (mounted && _isAlarmRinging) {
       setState(() {
         _isAlarmRinging = false;
@@ -266,7 +267,10 @@ class MainClockView extends ConsumerWidget {
     return Center(
       child: Stack(
         children: [
-          if (settings.isWeatherEnabled) const WeatherBackground(),
+          if (isAlarmRinging)
+            const AlarmVideoPlayer()
+          else if (settings.isWeatherEnabled)
+            const WeatherBackground(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
