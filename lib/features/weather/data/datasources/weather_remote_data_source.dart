@@ -17,7 +17,7 @@ class WeatherRemoteDataSourceImpl implements WeatherRemoteDataSource {
   Future<WeatherModel> getWeather(String cityName) async {
     debugPrint('getWeather $cityName $openWeatherApiKey');
     final uri = Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$openWeatherApiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/forecast?q=$cityName&appid=$openWeatherApiKey&units=metric');
 
     final response = await client.get(
       uri,

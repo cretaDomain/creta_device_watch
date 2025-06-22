@@ -14,6 +14,8 @@ class Weather extends Equatable {
   final int pressure;
   final int clouds;
   final DateTime lastUpdated;
+  final double? rainVolume;
+  final double? snowVolume;
 
   const Weather({
     required this.cityName,
@@ -29,6 +31,8 @@ class Weather extends Equatable {
     required this.pressure,
     required this.clouds,
     required this.lastUpdated,
+    this.rainVolume,
+    this.snowVolume,
   });
 
   @override
@@ -46,5 +50,7 @@ class Weather extends Equatable {
         pressure,
         clouds,
         lastUpdated,
+        rainVolume,
+        snowVolume,
       ];
 }

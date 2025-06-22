@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:creta_device_watch/features/weather/domain/entities/weather.dart';
 
 class WeatherModel extends Weather {
@@ -15,53 +17,89 @@ class WeatherModel extends Weather {
     required super.pressure,
     required super.clouds,
     required super.lastUpdated,
+    super.rainVolume,
+    super.snowVolume,
   });
 
   factory WeatherModel.fromJson(Map<String, dynamic> json) {
+    final currentWeather = json['list'][0];
+    final weatherList = json['list'] as List;
+
+    final today = DateTime.now();
+    double tempMinToday = double.maxFinite;
+    double tempMaxToday = -double.maxFinite;
+
+    for (var forecast in weatherList) {
+      final forecastDate = DateTime.parse(forecast['dt_txt']);
+      if (forecastDate.year == today.year &&
+          forecastDate.month == today.month &&
+          forecastDate.day == today.day) {
+        final temp = (forecast['main']['temp'] as num).toDouble();
+        tempMinToday = min(tempMinToday, temp);
+        tempMaxToday = max(tempMaxToday, temp);
+      }
+    }
+
+    if (tempMinToday == double.maxFinite) {
+      tempMinToday = (currentWeather['main']['temp_min'] as num).toDouble();
+    }
+    if (tempMaxToday == -double.maxFinite) {
+      tempMaxToday = (currentWeather['main']['temp_max'] as num).toDouble();
+    }
+
+    final rain = currentWeather['rain']?['3h'] as num?;
+    final snow = currentWeather['snow']?['3h'] as num?;
+
     return WeatherModel(
-      cityName: json['name'],
-      temperature: (json['main']['temp'] as num).toDouble(),
-      tempMin: (json['main']['temp_min'] as num).toDouble(),
-      tempMax: (json['main']['temp_max'] as num).toDouble(),
-      condition: json['weather'][0]['main'],
-      description: json['weather'][0]['description'],
-      icon: json['weather'][0]['icon'],
-      windSpeed: (json['wind']['speed'] as num).toDouble(),
-      windDirection: json['wind']['deg'],
-      humidity: json['main']['humidity'],
-      pressure: json['main']['pressure'],
-      clouds: json['clouds']['all'],
+      cityName: json['city']['name'],
+      temperature: (currentWeather['main']['temp'] as num).toDouble(),
+      tempMin: tempMinToday,
+      tempMax: tempMaxToday,
+      condition: currentWeather['weather'][0]['main'],
+      description: currentWeather['weather'][0]['description'],
+      icon: currentWeather['weather'][0]['icon'],
+      windSpeed: (currentWeather['wind']['speed'] as num).toDouble(),
+      windDirection: currentWeather['wind']['deg'],
+      humidity: currentWeather['main']['humidity'],
+      pressure: currentWeather['main']['pressure'],
+      clouds: currentWeather['clouds']['all'],
       lastUpdated: DateTime.now(),
+      rainVolume: rain?.toDouble() ?? 0.0,
+      snowVolume: snow?.toDouble() ?? 0.0,
     );
   }
 
   Map<String, dynamic> toJson() {
-    // Note: toJson might not be needed if we don't save weather data locally.
-    // This is a basic implementation for completeness.
     return {
-      'name': cityName,
-      'main': {
-        'temp': temperature,
-        'temp_min': tempMin,
-        'temp_max': tempMax,
-        'humidity': humidity,
-        'pressure': pressure,
-      },
-      'weather': [
+      'city': {'name': cityName},
+      'list': [
         {
-          'main': condition,
-          'description': description,
-          'icon': icon,
+          'main': {
+            'temp': temperature,
+            'temp_min': tempMin,
+            'temp_max': tempMax,
+            'humidity': humidity,
+            'pressure': pressure,
+          },
+          'weather': [
+            {
+              'main': condition,
+              'description': description,
+              'icon': icon,
+            }
+          ],
+          'wind': {
+            'speed': windSpeed,
+            'deg': windDirection,
+          },
+          'clouds': {
+            'all': clouds,
+          },
+          'dt_txt': lastUpdated.toIso8601String(),
+          'rain': rainVolume != null ? {'3h': rainVolume} : null,
+          'snow': snowVolume != null ? {'3h': snowVolume} : null,
         }
-      ],
-      'wind': {
-        'speed': windSpeed,
-        'deg': windDirection,
-      },
-      'clouds': {
-        'all': clouds,
-      },
-      'dt': lastUpdated.toIso8601String(),
+      ]
     };
   }
 }
