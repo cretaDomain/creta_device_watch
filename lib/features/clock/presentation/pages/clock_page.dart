@@ -142,9 +142,10 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     //   _audioPlayer.setReleaseMode(ReleaseMode.loop);
     // }
 
-    _alarmTimeout = Timer(const Duration(seconds: 30), () {
-      _dismissAlarm();
-    });
+    //자동 알람 off 기능은 사용하지 않는다.
+    // _alarmTimeout = Timer(const Duration(seconds: 30), () {
+    //   _dismissAlarm();
+    // });
   }
 
   void _dismissAlarm() {
