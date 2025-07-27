@@ -87,7 +87,7 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
             home: Center(
               child: Container(
                 width: widget.width,
-                height: widget.height,
+                height: _currentIndex == 1 ? max(widget.height, 480.0) : widget.height,
                 decoration: widget.showBorder
                     ? BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 10),
