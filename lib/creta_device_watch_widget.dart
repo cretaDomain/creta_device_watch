@@ -106,20 +106,17 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                       children: [
                         const CretaRSIMainScreen(),
                         Align(
-                          alignment: Alignment.topCenter,
+                          alignment: Alignment.topRight,
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 20.0),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
-                                shape: BoxShape.circle,
+                            padding: const EdgeInsets.only(top: 4, right: 100.0),
+                            child: IconButton(
+                              icon: const Icon(
+                                Icons.home_outlined,
+                                color: Colors.white,
                               ),
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                                iconSize: 72.0,
-                                onPressed: _showClockScreen,
-                                tooltip: '뒤로가기',
-                              ),
+                              iconSize: 32.0,
+                              onPressed: _showClockScreen,
+                              tooltip: '뒤로가기',
                             ),
                           ),
                         ),
