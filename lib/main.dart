@@ -4,18 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
+// ignore: depend_on_referenced_packages
+//import 'package:creta_music_visualizer/music_visualizer.dart';
 
 void main() async {
-  // Ensure that Flutter bindings are initialized.
   WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  final container = ProviderContainer(
+    overrides: [
+      rsi_providers.sharedPreferencesProvider.overrideWithValue(prefs),
+    ],
+  );
+
+  container.read(rsi_providers.settingsProvider.notifier).loadSettings();
+  container.read(rsi_providers.stockNotifierProvider.notifier).fetchStocks();
 
   if (Platform.isWindows) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(
       fullScreen: true,
-      // You can add other options here if needed, like:
-      // skipTaskbar: false,
-      // titleBarStyle: TitleBarStyle.hidden,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
@@ -23,18 +33,17 @@ void main() async {
     });
   }
 
-  // Initialize video_player_media_kit
   VideoPlayerMediaKit.ensureInitialized(
     windows: true,
     web: true,
   );
 
-  // Initialize the CretaDeviceWatch library.
   await initializeCretaDeviceWatch();
 
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
     ),
   );
 }
@@ -44,11 +53,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      // CretaDeviceWatchWidget을 사용하는 예제입니다.
-      // 필요에 따라 적절한 파라미터를 전달해야 할 수 있습니다.
-      // 현재는 기본 생성자를 사용합니다.
-      child: CretaDeviceWatchWidget(),
-    );
+    return const CretaDeviceWatchWidget();
   }
 }

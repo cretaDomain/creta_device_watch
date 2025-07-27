@@ -10,6 +10,9 @@ import 'package:creta_device_watch/features/clock/domain/entities/clock_settings
 import 'package:creta_device_watch/features/settings/presentation/widgets/settings_controls.dart';
 import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
 import 'package:creta_device_watch/features/clock/presentation/widgets/alarm_video_player.dart';
+import 'package:creta_rsi/creta_rsi.dart';
+import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/pages/world_clock_page.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 // ignore: unused_shown_name
@@ -21,12 +24,14 @@ class ClockPage extends ConsumerStatefulWidget {
   final List<String>? alarmTimes; // "YYYY/MM/DD HH:MM"
   final double width;
   final double height;
+  final VoidCallback onShowRsi;
 
   const ClockPage({
     super.key,
     this.alarmTimes,
     required this.width,
     required this.height,
+    required this.onShowRsi,
   });
 
   @override
@@ -179,6 +184,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           height: widget.height,
           isAlarmRinging: _isAlarmRinging,
           onDismissAlarm: _dismissAlarm,
+          onShowRsi: widget.onShowRsi,
           alarmTimes: _managedAlarmTimes,
           onAddAlarm: _addAlarm,
           onDeleteAlarm: _deleteAlarm,
@@ -244,6 +250,7 @@ class MainClockView extends ConsumerWidget {
   final double height;
   final bool isAlarmRinging;
   final VoidCallback onDismissAlarm;
+  final VoidCallback onShowRsi;
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
@@ -254,6 +261,7 @@ class MainClockView extends ConsumerWidget {
     required this.height,
     this.isAlarmRinging = false,
     required this.onDismissAlarm,
+    required this.onShowRsi,
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
@@ -320,6 +328,7 @@ class MainClockView extends ConsumerWidget {
               SettingsControls(
                 isAlarmRinging: isAlarmRinging,
                 onDismissAlarm: onDismissAlarm,
+                onShowRsi: onShowRsi,
                 alarmTimes: alarmTimes,
                 onAddAlarm: onAddAlarm,
                 onDeleteAlarm: onDeleteAlarm,

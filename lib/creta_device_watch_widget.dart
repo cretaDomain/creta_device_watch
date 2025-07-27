@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:creta_rsi/creta_rsi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -35,7 +36,7 @@ Future<void> initializeCretaDeviceWatch() async {
 /// 디지털 시계를 표시하는 위젯입니다.
 ///
 /// 이 위젯이 올바르게 작동하려면 `ProviderScope`로 감싸야 합니다.
-class CretaDeviceWatchWidget extends ConsumerWidget {
+class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
   final List<String> alarmTimes;
   final double width;
   final double height;
@@ -50,7 +51,26 @@ class CretaDeviceWatchWidget extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CretaDeviceWatchWidget> createState() => _CretaDeviceWatchWidgetState();
+}
+
+class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget> {
+  int _currentIndex = 0;
+
+  void _showRsiScreen() {
+    setState(() {
+      _currentIndex = 1;
+    });
+  }
+
+  void _showClockScreen() {
+    setState(() {
+      _currentIndex = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sharedPreferencesAsync = ref.watch(sharedPreferencesProvider);
 
     return sharedPreferencesAsync.when(
@@ -59,23 +79,53 @@ class CretaDeviceWatchWidget extends ConsumerWidget {
         return Transform.rotate(
           angle: settings.isFlipped ? pi : 0,
           child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Digital Clock',
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: settings.themeMode,
             home: Center(
               child: Container(
-                width: width,
-                height: height,
-                decoration: showBorder
+                width: widget.width,
+                height: widget.height,
+                decoration: widget.showBorder
                     ? BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 10),
                       )
                     : null,
-                child: ClockPage(
-                  width: width,
-                  height: height,
-                  alarmTimes: alarmTimes,
+                child: IndexedStack(
+                  index: _currentIndex,
+                  children: [
+                    ClockPage(
+                      width: widget.width,
+                      height: widget.height,
+                      alarmTimes: widget.alarmTimes,
+                      onShowRsi: _showRsiScreen,
+                    ),
+                    Stack(
+                      children: [
+                        const CretaRSIMainScreen(),
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 20.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                iconSize: 72.0,
+                                onPressed: _showClockScreen,
+                                tooltip: '뒤로가기',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),

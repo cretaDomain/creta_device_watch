@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
   media_kit_libs_linux
   media_kit_video
+  record_linux
   screen_retriever
   volume_controller
   window_manager

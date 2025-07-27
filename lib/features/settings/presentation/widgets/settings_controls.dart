@@ -8,6 +8,7 @@ import 'package:creta_device_watch/features/fortune_cookie/presentation/widgets/
 class SettingsControls extends ConsumerWidget {
   final bool isAlarmRinging;
   final VoidCallback onDismissAlarm;
+  final VoidCallback onShowRsi;
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
@@ -18,6 +19,7 @@ class SettingsControls extends ConsumerWidget {
     super.key,
     this.isAlarmRinging = false,
     required this.onDismissAlarm,
+    required this.onShowRsi,
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
@@ -130,6 +132,12 @@ class SettingsControls extends ConsumerWidget {
                 settingsNotifier.toggleWeatherFeature();
               },
               tooltip: '날씨 보기 ${settings.isWeatherEnabled ? '끄기' : '켜기'}',
+            ),
+            const SizedBox(width: 20),
+            IconButton(
+              icon: const Icon(Icons.candlestick_chart),
+              onPressed: onShowRsi,
+              tooltip: '주식 정보 보기',
             ),
           ]
         ],

@@ -52,6 +52,7 @@ dependencies:
   translator: ^1.0.3+1
   google_generative_ai: ^0.4.7
   window_manager: ^0.3.9
+  creta_rsi: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +68,7 @@ dev_dependencies:
   mockito: ^5.4.4
   build_runner: ^2.4.10
   json_serializable: ^6.8.0
+  creta_music_visualizer: ^1.0.1
 
 dependency_overrides:
   analyzer: ^6.4.1
