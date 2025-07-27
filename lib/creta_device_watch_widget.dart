@@ -55,17 +55,11 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
 }
 
 class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget> {
-  int _currentIndex = 0;
+  bool _showRsiScreen = false;
 
-  void _showRsiScreen() {
+  void _toggleScreen() {
     setState(() {
-      _currentIndex = 1;
-    });
-  }
-
-  void _showClockScreen() {
-    setState(() {
-      _currentIndex = 0;
+      _showRsiScreen = !_showRsiScreen;
     });
   }
 
@@ -87,43 +81,39 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
             home: Center(
               child: Container(
                 width: widget.width,
-                height: _currentIndex == 1 ? max(widget.height, 480.0) : widget.height,
+                height: _showRsiScreen ? max(widget.height, 480.0) : widget.height,
                 decoration: widget.showBorder
                     ? BoxDecoration(
                         border: Border.all(color: Colors.blue, width: 10),
                       )
                     : null,
-                child: IndexedStack(
-                  index: _currentIndex,
-                  children: [
-                    ClockPage(
-                      width: widget.width,
-                      height: widget.height,
-                      alarmTimes: widget.alarmTimes,
-                      onShowRsi: _showRsiScreen,
-                    ),
-                    Stack(
-                      children: [
-                        const CretaRSIMainScreen(),
-                        Align(
-                          alignment: Alignment.topRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 4, right: 100.0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.home_outlined,
-                                color: Colors.white,
+                child: _showRsiScreen
+                    ? Stack(
+                        children: [
+                          const CretaRSIMainScreen(),
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 4, right: 100.0),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.home_outlined,
+                                  color: Colors.white,
+                                ),
+                                iconSize: 32.0,
+                                onPressed: _toggleScreen,
+                                tooltip: '뒤로가기',
                               ),
-                              iconSize: 32.0,
-                              onPressed: _showClockScreen,
-                              tooltip: '뒤로가기',
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                        ],
+                      )
+                    : ClockPage(
+                        width: widget.width,
+                        height: widget.height,
+                        alarmTimes: widget.alarmTimes,
+                        onShowRsi: _toggleScreen,
+                      ),
               ),
             ),
           ),
