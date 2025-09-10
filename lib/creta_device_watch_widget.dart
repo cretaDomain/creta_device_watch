@@ -12,10 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/app_theme.dart';
 
-// Size and aspect constraints for the watch UI
-const double kMinWatchWidth = 822.0; // Minimum supported width
-const double kMinWatchHeight = 252.0; // Minimum supported height
-const double kWatchAspectRatio = kMinWatchWidth / kMinWatchHeight; // 822 : 252
+// Base size and aspect for the watch UI (1920 : 480)
+const double kMinWatchWidth = 1920.0; // Base width for aspect calculation
+const double kMinWatchHeight = 480.0; // Base height for aspect calculation
+const double kWatchAspectRatio = kMinWatchWidth / kMinWatchHeight; // 1920 : 480
 
 /// [CretaDeviceWatchWidget]에 필요한 의존성을 초기화합니다.
 ///

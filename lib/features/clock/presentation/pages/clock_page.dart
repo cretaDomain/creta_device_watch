@@ -181,16 +181,16 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     // ignore: unused_local_variable
     final settings = ref.watch(settingsProvider);
     // Compute responsive scale: constrain by width and height to prevent overflow
-    final widthScale = widget.width / 822.0; // base width
+    final widthScale = widget.width / 1920.0; // base width
     const double baseDateRow = 40.0; // approximate at scale=1
     const double baseSpacingTop = 20.0;
-    const double baseDigitHeight = 150.0; // our digit height base
+    const double baseDigitHeight = 320.0; // match digitHeight baseline used in display
     const double baseSpacingBottom = 20.0;
     final double baseControls = widget.showMenuButtons ? 56.0 : 0.0; // approx controls height
     final double baseTotalHeight =
         baseDateRow + baseSpacingTop + baseDigitHeight + baseSpacingBottom + baseControls;
     final heightScale = widget.height / baseTotalHeight;
-    final scale = widthScale.clamp(0.2, 3.0);
+    final scale = widthScale.clamp(0.03, 3.0);
     final fitScale = scale <= heightScale ? scale : heightScale;
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
@@ -394,106 +394,109 @@ class MainClockView extends ConsumerWidget {
     final brightness = Theme.of(context).brightness;
     final textColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
 
-    final scale = (this.scale).clamp(0.24, 3.0);
+    final scale = (this.scale).clamp(0.03, 3.0);
+    // Tune base digit sizes for new 1920:480 baseline so digits fill more width
+    final digitWidth = 280.0 * scale;
+    final digitHeight = 320.0 * scale;
     final textStyle = fontStyle.copyWith(
       color: textColor,
-      fontSize: (fontStyle.fontSize ?? 60.0) * scale,
+      fontSize: digitHeight * 0.66,
     );
-
-    final digitWidth = 120.0 * scale;
-    final digitHeight = 150.0 * scale; // reduce height by ~10% to avoid overflow
     final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.8);
     //final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (timeFormat == TimeFormat.h12) ...[
-          Text(
-            amPm,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontSize: (Theme.of(context).textTheme.headlineMedium?.fontSize ?? 32) * scale),
+    return FittedBox(
+      fit: BoxFit.contain,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (timeFormat == TimeFormat.h12) ...[
+            Text(
+              amPm,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontSize: (Theme.of(context).textTheme.headlineMedium?.fontSize ?? 32) * scale),
+            ),
+            SizedBox(width: 16 * scale),
+          ],
+          // Hour
+          FlipDigit(
+            initialValue: hour ~/ 10,
+            stream: stream.map((t) {
+              int h = t.hour;
+              if (timeFormat == TimeFormat.h12) {
+                h = h % 12;
+                if (h == 0) h = 12;
+              }
+              return h ~/ 10;
+            }).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
           ),
-          SizedBox(width: 16 * scale),
+          SizedBox(width: 8 * scale),
+          FlipDigit(
+            initialValue: hour % 10,
+            stream: stream.map((t) {
+              int h = t.hour;
+              if (timeFormat == TimeFormat.h12) {
+                h = h % 12;
+                if (h == 0) h = 12;
+              }
+              return h % 10;
+            }).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
+          ),
+          _buildSeparator(context, fontStyle),
+          // Minute
+          FlipDigit(
+            initialValue: minute ~/ 10,
+            stream: stream.map((t) => t.minute ~/ 10).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
+          ),
+          SizedBox(width: 8 * scale),
+          FlipDigit(
+            initialValue: minute % 10,
+            stream: stream.map((t) => t.minute % 10).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
+          ),
+          _buildSeparator(context, fontStyle),
+          // Second
+          FlipDigit(
+            initialValue: second ~/ 10,
+            stream: stream.map((t) => t.second ~/ 10).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
+          ),
+          SizedBox(width: 8 * scale),
+          FlipDigit(
+            initialValue: second % 10,
+            stream: stream.map((t) => t.second % 10).distinct(),
+            textStyle: textStyle,
+            width: digitWidth,
+            height: digitHeight,
+            backgroundColor: digitBackgroundColor,
+          ),
         ],
-        // Hour
-        FlipDigit(
-          initialValue: hour ~/ 10,
-          stream: stream.map((t) {
-            int h = t.hour;
-            if (timeFormat == TimeFormat.h12) {
-              h = h % 12;
-              if (h == 0) h = 12;
-            }
-            return h ~/ 10;
-          }).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-        SizedBox(width: 8 * scale),
-        FlipDigit(
-          initialValue: hour % 10,
-          stream: stream.map((t) {
-            int h = t.hour;
-            if (timeFormat == TimeFormat.h12) {
-              h = h % 12;
-              if (h == 0) h = 12;
-            }
-            return h % 10;
-          }).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-        _buildSeparator(context, fontStyle),
-        // Minute
-        FlipDigit(
-          initialValue: minute ~/ 10,
-          stream: stream.map((t) => t.minute ~/ 10).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-        SizedBox(width: 8 * scale),
-        FlipDigit(
-          initialValue: minute % 10,
-          stream: stream.map((t) => t.minute % 10).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-        _buildSeparator(context, fontStyle),
-        // Second
-        FlipDigit(
-          initialValue: second ~/ 10,
-          stream: stream.map((t) => t.second ~/ 10).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-        SizedBox(width: 8 * scale),
-        FlipDigit(
-          initialValue: second % 10,
-          stream: stream.map((t) => t.second % 10).distinct(),
-          textStyle: textStyle,
-          width: digitWidth,
-          height: digitHeight,
-          backgroundColor: digitBackgroundColor,
-        ),
-      ],
+      ),
     );
   }
 
   Widget _buildSeparator(BuildContext context, TextStyle fontStyle) {
     final brightness = Theme.of(context).brightness;
     final separatorColor = brightness == Brightness.dark ? Colors.white54 : Colors.black54;
-    final scale = (this.scale).clamp(0.24, 3.0);
+    final scale = (this.scale).clamp(0.03, 3.0);
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 12.0 * scale),
       child: Text(
