@@ -15,6 +15,7 @@ class SettingsControls extends ConsumerWidget {
   final double width;
   final double height;
   final bool useOnlyWatch;
+  final double scale;
 
   const SettingsControls({
     super.key,
@@ -27,6 +28,7 @@ class SettingsControls extends ConsumerWidget {
     required this.width,
     required this.height,
     this.useOnlyWatch = false,
+    this.scale = 1.0,
   });
 
   @override
@@ -34,8 +36,9 @@ class SettingsControls extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final settingsNotifier = ref.read(settingsProvider.notifier);
 
+    final s = scale.clamp(0.24, 3.0);
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0 * s),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -45,7 +48,7 @@ class SettingsControls extends ConsumerWidget {
               onPressed: onDismissAlarm,
               tooltip: 'Dismiss Alarm',
               color: Theme.of(context).colorScheme.error,
-              iconSize: 45, // 50% larger than the previous 30
+              iconSize: 45 * s,
             )
           else ...[
             // Theme Toggle
@@ -59,8 +62,9 @@ class SettingsControls extends ConsumerWidget {
                 settingsNotifier.updateThemeMode(newMode);
               },
               tooltip: 'Toggle Theme',
+              iconSize: 24 * s,
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
 
             // Font Toggle
             IconButton(
@@ -69,8 +73,9 @@ class SettingsControls extends ConsumerWidget {
                 ref.read(fontProvider.notifier).toggleFont();
               },
               tooltip: 'Toggle Font',
+              iconSize: 24 * s,
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
 
             // Time Format Toggle
             InkWell(
@@ -81,10 +86,10 @@ class SettingsControls extends ConsumerWidget {
               },
               child: Text(
                 settings.timeFormat == TimeFormat.h24 ? '24 H' : '12 H',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18 * s, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
             if (!useOnlyWatch)
               IconButton(
                 icon: Icon(
@@ -103,8 +108,9 @@ class SettingsControls extends ConsumerWidget {
                 },
                 tooltip:
                     alarmTimes != null && alarmTimes!.isNotEmpty ? '알람이 설정되었습니다.' : '설정된 알람 없음',
+                iconSize: 24 * s,
               ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
             if (!useOnlyWatch)
               IconButton(
                 icon: const Icon(Icons.cookie),
@@ -118,16 +124,18 @@ class SettingsControls extends ConsumerWidget {
                   );
                 },
                 tooltip: '오늘의 포춘쿠키',
+                iconSize: 24 * s,
               ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
             IconButton(
               icon: const Icon(Icons.screen_rotation_outlined),
               onPressed: () {
                 settingsNotifier.toggleFlipped();
               },
               tooltip: '화면 180도 회전',
+              iconSize: 24 * s,
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
             if (!useOnlyWatch)
               IconButton(
                 icon: Icon(
@@ -137,13 +145,15 @@ class SettingsControls extends ConsumerWidget {
                   settingsNotifier.toggleWeatherFeature();
                 },
                 tooltip: '날씨 보기 ${settings.isWeatherEnabled ? '끄기' : '켜기'}',
+                iconSize: 24 * s,
               ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * s),
             if (!useOnlyWatch)
               IconButton(
                 icon: const Icon(Icons.candlestick_chart),
                 onPressed: onShowRsi,
                 tooltip: '주식 정보 보기',
+                iconSize: 24 * s,
               ),
           ]
         ],

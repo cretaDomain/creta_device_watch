@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
     return const CretaDeviceWatchWidget(
       showMenuButtons: false,
       useOnlyWatch: true,
-      width: 822,
+      width: 200,
       darkMode: true,
     );
   }

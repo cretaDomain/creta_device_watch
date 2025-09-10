@@ -180,6 +180,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     final settings = ref.watch(settingsProvider);
+    final scale = widget.width / 822.0; // Responsive scale based on base width 822
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
         body: //clockView == ClockView.main          ?
@@ -194,6 +195,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           onDeleteAlarm: _deleteAlarm,
           useOnlyWatch: widget.useOnlyWatch,
           showMenuButtons: widget.showMenuButtons,
+          scale: scale.clamp(0.24, 3.0),
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -262,6 +264,7 @@ class MainClockView extends ConsumerWidget {
   final Function(int) onDeleteAlarm;
   final bool useOnlyWatch;
   final bool showMenuButtons;
+  final double scale;
 
   const MainClockView({
     super.key,
@@ -275,6 +278,7 @@ class MainClockView extends ConsumerWidget {
     required this.onDeleteAlarm,
     this.useOnlyWatch = false,
     this.showMenuButtons = true,
+    this.scale = 1.0,
   });
 
   @override
@@ -299,16 +303,17 @@ class MainClockView extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      DateFormat.yMMMMd('en_US')
-                          .add_E()
-                          .format(time), // 'yyyy년 M월 d일 (E)', 'ko_KR' -> yMMMMd('en_US').add_E()
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      DateFormat.yMMMMd('en_US').add_E().format(time),
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontSize:
+                              (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) * scale),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8 * scale),
                     if (!useOnlyWatch)
                       IconButton(
                         tooltip: '오늘 있었던 역사적 사건',
                         icon: const Icon(Icons.history),
+                        iconSize: 24 * scale,
                         onPressed: () {
                           showDialog(
                             context: context,
@@ -322,10 +327,10 @@ class MainClockView extends ConsumerWidget {
                       ),
                   ],
                 ),
-                loading: () => const SizedBox(height: 30),
+                loading: () => SizedBox(height: 30 * scale),
                 error: (err, stack) => const Text('Error'),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20 * scale),
               // Flip Clock
               asyncTime.when(
                 data: (time) => _buildClockDisplay(context, time,
@@ -334,7 +339,7 @@ class MainClockView extends ConsumerWidget {
                     context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
                 error: (err, stack) => const Text('Error displaying clock'),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20 * scale),
               // Settings, Alarm, and Dismiss controls
               if (showMenuButtons)
                 SettingsControls(
@@ -347,6 +352,7 @@ class MainClockView extends ConsumerWidget {
                   width: width,
                   height: height,
                   useOnlyWatch: useOnlyWatch,
+                  scale: scale,
                 ),
             ],
           ),
@@ -372,10 +378,14 @@ class MainClockView extends ConsumerWidget {
     final brightness = Theme.of(context).brightness;
     final textColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
 
-    final textStyle = fontStyle.copyWith(color: textColor);
+    final scale = (this.scale).clamp(0.24, 3.0);
+    final textStyle = fontStyle.copyWith(
+      color: textColor,
+      fontSize: (fontStyle.fontSize ?? 60.0) * scale,
+    );
 
-    const digitWidth = 120.0;
-    const digitHeight = 180.0;
+    final digitWidth = 120.0 * scale;
+    final digitHeight = 150.0 * scale; // reduce height by ~10% to avoid overflow
     final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.8);
     //final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
@@ -383,8 +393,12 @@ class MainClockView extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (timeFormat == TimeFormat.h12) ...[
-          Text(amPm, style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(width: 16),
+          Text(
+            amPm,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontSize: (Theme.of(context).textTheme.headlineMedium?.fontSize ?? 32) * scale),
+          ),
+          SizedBox(width: 16 * scale),
         ],
         // Hour
         FlipDigit(
@@ -402,7 +416,7 @@ class MainClockView extends ConsumerWidget {
           height: digitHeight,
           backgroundColor: digitBackgroundColor,
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8 * scale),
         FlipDigit(
           initialValue: hour % 10,
           stream: stream.map((t) {
@@ -428,7 +442,7 @@ class MainClockView extends ConsumerWidget {
           height: digitHeight,
           backgroundColor: digitBackgroundColor,
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8 * scale),
         FlipDigit(
           initialValue: minute % 10,
           stream: stream.map((t) => t.minute % 10).distinct(),
@@ -447,7 +461,7 @@ class MainClockView extends ConsumerWidget {
           height: digitHeight,
           backgroundColor: digitBackgroundColor,
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8 * scale),
         FlipDigit(
           initialValue: second % 10,
           stream: stream.map((t) => t.second % 10).distinct(),
@@ -463,13 +477,14 @@ class MainClockView extends ConsumerWidget {
   Widget _buildSeparator(BuildContext context, TextStyle fontStyle) {
     final brightness = Theme.of(context).brightness;
     final separatorColor = brightness == Brightness.dark ? Colors.white54 : Colors.black54;
+    final scale = (this.scale).clamp(0.24, 3.0);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      padding: EdgeInsets.symmetric(horizontal: 12.0 * scale),
       child: Text(
         ':',
         style: TextStyle(
           fontFamily: fontStyle.fontFamily,
-          fontSize: Theme.of(context).textTheme.displayLarge?.fontSize,
+          fontSize: (Theme.of(context).textTheme.displayLarge?.fontSize ?? 96) * scale,
           fontWeight: FontWeight.bold,
           color: separatorColor,
         ),

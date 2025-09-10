@@ -121,9 +121,9 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                 themeMode: settings.themeMode,
                 home: Center(
                   child: Container(
-                    width: max(widget.width, kMinWatchWidth),
+                    width: widget.width,
                     height: () {
-                      final effectiveWidth = max(widget.width, kMinWatchWidth);
+                      final effectiveWidth = widget.width;
                       final computedHeight = effectiveWidth / kWatchAspectRatio;
                       return _showRsiScreen && !widget.useOnlyWatch
                           ? max(computedHeight, 480.0)
@@ -156,8 +156,8 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                             ],
                           )
                         : ClockPage(
-                            width: max(widget.width, kMinWatchWidth),
-                            height: max(widget.width, kMinWatchWidth) / kWatchAspectRatio,
+                            width: widget.width,
+                            height: widget.width / kWatchAspectRatio,
                             alarmTimes: widget.alarmTimes,
                             onShowRsi: widget.useOnlyWatch ? () {} : _toggleScreen,
                             useOnlyWatch: widget.useOnlyWatch,
