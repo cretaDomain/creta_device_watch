@@ -9,7 +9,7 @@ import 'package:creta_device_watch/features/clock/presentation/widgets/flip_digi
 import 'package:creta_device_watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:creta_device_watch/features/settings/presentation/widgets/settings_controls.dart';
 import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
-import 'package:creta_device_watch/features/clock/presentation/widgets/alarm_video_player.dart';
+// import 'package:creta_device_watch/features/clock/presentation/widgets/alarm_video_player.dart';
 // import 'package:creta_rsi/creta_rsi.dart';
 // import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
 // import 'package:shared_preferences/shared_preferences.dart';
@@ -180,7 +180,18 @@ class _ClockPageState extends ConsumerState<ClockPage> {
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     final settings = ref.watch(settingsProvider);
-    final scale = widget.width / 822.0; // Responsive scale based on base width 822
+    // Compute responsive scale: constrain by width and height to prevent overflow
+    final widthScale = widget.width / 822.0; // base width
+    const double baseDateRow = 40.0; // approximate at scale=1
+    const double baseSpacingTop = 20.0;
+    const double baseDigitHeight = 150.0; // our digit height base
+    const double baseSpacingBottom = 20.0;
+    final double baseControls = widget.showMenuButtons ? 56.0 : 0.0; // approx controls height
+    final double baseTotalHeight =
+        baseDateRow + baseSpacingTop + baseDigitHeight + baseSpacingBottom + baseControls;
+    final heightScale = widget.height / baseTotalHeight;
+    final scale = widthScale.clamp(0.2, 3.0);
+    final fitScale = scale <= heightScale ? scale : heightScale;
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
         body: //clockView == ClockView.main          ?
@@ -195,7 +206,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           onDeleteAlarm: _deleteAlarm,
           useOnlyWatch: widget.useOnlyWatch,
           showMenuButtons: widget.showMenuButtons,
-          scale: scale.clamp(0.24, 3.0),
+          scale: fitScale.clamp(0.2, 3.0),
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -291,7 +302,12 @@ class MainClockView extends ConsumerWidget {
       child: Stack(
         children: [
           if (isAlarmRinging)
-            const AlarmVideoPlayer()
+            SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: Image.asset('assets/images/alarm.png'),
+              ),
+            )
           else if (settings.isWeatherEnabled && !useOnlyWatch)
             const WeatherBackground(),
           Column(

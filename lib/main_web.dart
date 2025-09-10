@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
 import 'package:creta_device_watch/creta_device_watch_widget.dart';
@@ -18,10 +17,7 @@ void main() async {
   container.read(rsi_providers.settingsProvider.notifier).loadSettings();
   container.read(rsi_providers.stockNotifierProvider.notifier).fetchStocks();
 
-  VideoPlayerMediaKit.ensureInitialized(
-    windows: false,
-    web: true,
-  );
+  // Video libraries removed
 
   await initializeCretaDeviceWatch();
 
@@ -41,7 +37,7 @@ class MyApp extends StatelessWidget {
     return const CretaDeviceWatchWidget(
       showMenuButtons: false,
       useOnlyWatch: true,
-      width: 200,
+      width: 1920,
       darkMode: true,
     );
   }

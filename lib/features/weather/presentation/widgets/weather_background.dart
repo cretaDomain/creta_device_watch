@@ -1,10 +1,8 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_player/video_player.dart';
 import 'package:creta_device_watch/core/di/provider.dart';
 import 'package:creta_device_watch/features/weather/domain/entities/weather.dart';
 import 'package:intl/intl.dart';
@@ -17,76 +15,32 @@ class WeatherBackground extends ConsumerStatefulWidget {
 }
 
 class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
-  final Map<String, VideoPlayerController> _videoControllers = {};
-  VideoPlayerController? _activeController;
-  bool _videosInitialized = false;
+  String? _activeImageAsset;
 
   @override
   void initState() {
     super.initState();
-    _initializeAllVideos();
     ref.listenManual(weatherProvider, (previous, next) {
-      _updateActiveController(next.weather);
+      _updateActiveImage(next.weather);
     });
+    _updateActiveImage(ref.read(weatherProvider).weather);
   }
 
-  Future<void> _initializeAllVideos() async {
-    final videoAssets = {
-      'clear': 'assets/videos/clear.mp4',
-      'clouds': 'assets/videos/clouds.mp4',
-      'rain': 'assets/videos/rain.mp4',
-      'snow': 'assets/videos/snow.mp4',
-      'drizzle': 'assets/videos/drizzle.mp4',
-      'thunderstorm': 'assets/videos/thunderstorm.mp4',
-      'mist': 'assets/videos/mist.mp4',
-    };
-
-    try {
-      final futures = videoAssets.entries.map((entry) {
-        final controller = VideoPlayerController.asset(entry.value);
-        _videoControllers[entry.key] = controller;
-        return controller.initialize().then((_) {
-          controller.setLooping(true);
-        });
-      }).toList();
-
-      await Future.wait(futures);
-    } catch (e) {
-      debugPrint("Error initializing videos: $e");
-    }
-
-    if (mounted) {
-      setState(() {
-        _videosInitialized = true;
-      });
-      _updateActiveController(ref.read(weatherProvider).weather);
-    }
-  }
-
-  void _updateActiveController(Weather? weather) {
-    if (!_videosInitialized || !mounted) return;
-
-    VideoPlayerController? newController;
+  void _updateActiveImage(Weather? weather) {
+    if (!mounted) return;
+    String? newAsset;
     if (weather != null) {
-      try {
-        final videoKey = _getVideoKeyForCondition(weather.condition);
-        newController = _videoControllers[videoKey];
-      } catch (e) {
-        debugPrint("Could not find video for weather condition: $e");
-        newController = null;
-      }
+      final key = _getKeyForCondition(weather.condition);
+      newAsset = 'assets/images/$key.png';
     }
-
-    if (newController != _activeController) {
+    if (newAsset != _activeImageAsset) {
       setState(() {
-        _activeController?.pause();
-        _activeController = newController;
-        _activeController?.play();
+        _activeImageAsset = newAsset;
       });
     }
   }
 
-  String _getVideoKeyForCondition(String condition) {
+  String _getKeyForCondition(String condition) {
     final lowerCaseCondition = condition.toLowerCase();
     switch (lowerCaseCondition) {
       case 'clear':
@@ -107,9 +61,6 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
 
   @override
   void dispose() {
-    for (var controller in _videoControllers.values) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -120,25 +71,13 @@ class _WeatherBackgroundState extends ConsumerState<WeatherBackground> {
     final fallbackColor = brightness == Brightness.dark ? Colors.black : Colors.white;
     final fallbackWidget = Container(color: fallbackColor);
 
-    if (!_videosInitialized) {
-      return Stack(children: [fallbackWidget, const Center(child: CircularProgressIndicator())]);
-    }
-
-    final showVideo = _activeController != null &&
-        _activeController!.value.isInitialized &&
-        weatherState.error == null;
-
     return Stack(
       children: [
-        if (showVideo)
+        if (_activeImageAsset != null)
           SizedBox.expand(
             child: FittedBox(
               fit: BoxFit.cover,
-              child: SizedBox(
-                width: _activeController!.value.size.width,
-                height: _activeController!.value.size.height,
-                child: VideoPlayer(_activeController!),
-              ),
+              child: Image.asset(_activeImageAsset!),
             ),
           )
         else

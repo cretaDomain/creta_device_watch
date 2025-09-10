@@ -1,7 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
@@ -33,10 +32,7 @@ void main() async {
     });
   }
 
-  VideoPlayerMediaKit.ensureInitialized(
-    windows: true,
-    web: true,
-  );
+  // Video libraries removed
 
   await initializeCretaDeviceWatch();
 
@@ -53,10 +49,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CretaDeviceWatchWidget(
-      showMenuButtons: false,
-      useOnlyWatch: true,
-      width: 400,
-    );
+    return const CretaDeviceWatchWidget();
   }
 }
