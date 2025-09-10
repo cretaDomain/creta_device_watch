@@ -192,6 +192,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     final heightScale = widget.height / baseTotalHeight;
     final scale = widthScale.clamp(0.03, 3.0);
     final fitScale = scale <= heightScale ? scale : heightScale;
+    final adjustedScale = widget.useOnlyWatch ? fitScale : (fitScale * 0.75);
     final pageContent = Scaffold(
         backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
         body: //clockView == ClockView.main          ?
@@ -206,7 +207,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           onDeleteAlarm: _deleteAlarm,
           useOnlyWatch: widget.useOnlyWatch,
           showMenuButtons: widget.showMenuButtons,
-          scale: fitScale.clamp(0.2, 3.0),
+          scale: adjustedScale.clamp(0.2, 3.0),
         )
         // : WorldClockPage(
         //     onAddCity: () {

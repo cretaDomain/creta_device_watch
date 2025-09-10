@@ -49,6 +49,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CretaDeviceWatchWidget();
+    return const CretaDeviceWatchWidget(
+        //width: 1920,
+        );
   }
 }
