@@ -45,3 +45,5 @@ class MyApp extends StatelessWidget {
 ```
 flutter run -d chrome --web-browser-flag "--disable-web-security" --dart-define=GEMINI_API_KEY=...
 
+flutter run -d chrome -t lib/main_web.dart 
+flutter build web -t lib/main_web.dart

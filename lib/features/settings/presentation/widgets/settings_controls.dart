@@ -14,6 +14,7 @@ class SettingsControls extends ConsumerWidget {
   final Function(int) onDeleteAlarm;
   final double width;
   final double height;
+  final bool useOnlyWatch;
 
   const SettingsControls({
     super.key,
@@ -25,6 +26,7 @@ class SettingsControls extends ConsumerWidget {
     required this.onDeleteAlarm,
     required this.width,
     required this.height,
+    this.useOnlyWatch = false,
   });
 
   @override
@@ -83,38 +85,40 @@ class SettingsControls extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 20),
-            IconButton(
-              icon: Icon(
-                  alarmTimes != null && alarmTimes!.isNotEmpty ? Icons.alarm : Icons.alarm_add),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlarmSettingsDialog(
-                      alarmTimes: alarmTimes ?? [],
-                      onAddAlarm: onAddAlarm,
-                      onDeleteAlarm: onDeleteAlarm,
-                    );
-                  },
-                );
-              },
-              tooltip: alarmTimes != null && alarmTimes!.isNotEmpty ? '알람이 설정되었습니다.' : '설정된 알람 없음',
-            ),
+            if (!useOnlyWatch)
+              IconButton(
+                icon: Icon(
+                    alarmTimes != null && alarmTimes!.isNotEmpty ? Icons.alarm : Icons.alarm_add),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlarmSettingsDialog(
+                        alarmTimes: alarmTimes ?? [],
+                        onAddAlarm: onAddAlarm,
+                        onDeleteAlarm: onDeleteAlarm,
+                      );
+                    },
+                  );
+                },
+                tooltip:
+                    alarmTimes != null && alarmTimes!.isNotEmpty ? '알람이 설정되었습니다.' : '설정된 알람 없음',
+              ),
             const SizedBox(width: 20),
-            IconButton(
-              icon: const Icon(Icons.cookie),
-              onPressed: () {
-                //final size = MediaQuery.of(context).size;
-                showDialog(
-                  context: context,
-                  builder: (context) => FortuneCookieDialog(
-                    width: width,
-                    height: height,
-                  ),
-                );
-              },
-              tooltip: '오늘의 포춘쿠키',
-            ),
+            if (!useOnlyWatch)
+              IconButton(
+                icon: const Icon(Icons.cookie),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => FortuneCookieDialog(
+                      width: width,
+                      height: height,
+                    ),
+                  );
+                },
+                tooltip: '오늘의 포춘쿠키',
+              ),
             const SizedBox(width: 20),
             IconButton(
               icon: const Icon(Icons.screen_rotation_outlined),
@@ -124,21 +128,23 @@ class SettingsControls extends ConsumerWidget {
               tooltip: '화면 180도 회전',
             ),
             const SizedBox(width: 20),
-            IconButton(
-              icon: Icon(
-                settings.isWeatherEnabled ? Icons.cloud : Icons.cloud_off,
+            if (!useOnlyWatch)
+              IconButton(
+                icon: Icon(
+                  settings.isWeatherEnabled ? Icons.cloud : Icons.cloud_off,
+                ),
+                onPressed: () {
+                  settingsNotifier.toggleWeatherFeature();
+                },
+                tooltip: '날씨 보기 ${settings.isWeatherEnabled ? '끄기' : '켜기'}',
               ),
-              onPressed: () {
-                settingsNotifier.toggleWeatherFeature();
-              },
-              tooltip: '날씨 보기 ${settings.isWeatherEnabled ? '끄기' : '켜기'}',
-            ),
             const SizedBox(width: 20),
-            IconButton(
-              icon: const Icon(Icons.candlestick_chart),
-              onPressed: onShowRsi,
-              tooltip: '주식 정보 보기',
-            ),
+            if (!useOnlyWatch)
+              IconButton(
+                icon: const Icon(Icons.candlestick_chart),
+                onPressed: onShowRsi,
+                tooltip: '주식 정보 보기',
+              ),
           ]
         ],
       ),

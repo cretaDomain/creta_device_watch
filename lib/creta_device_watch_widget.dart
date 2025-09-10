@@ -8,8 +8,14 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:creta_device_watch/core/di/provider.dart';
 import 'package:creta_device_watch/features/clock/presentation/pages/clock_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/app_theme.dart';
+
+// Size and aspect constraints for the watch UI
+const double kMinWatchWidth = 822.0; // Minimum supported width
+const double kMinWatchHeight = 252.0; // Minimum supported height
+const double kWatchAspectRatio = kMinWatchWidth / kMinWatchHeight; // 822 : 252
 
 /// [CretaDeviceWatchWidget]에 필요한 의존성을 초기화합니다.
 ///
@@ -39,15 +45,21 @@ Future<void> initializeCretaDeviceWatch() async {
 class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
   final List<String> alarmTimes;
   final double width;
-  final double height;
   final bool showBorder;
+  final bool useOnlyWatch; // 시계 기능만 사용
+  final bool showMenuButtons; // 하단 메뉴 표시 여부
+  final bool darkMode; // 초기 다크 모드 여부
+  final bool flipScreen; // 초기 화면 회전 여부(뒤집기)
 
   const CretaDeviceWatchWidget({
     super.key,
     this.alarmTimes = const [],
     this.width = 1920,
-    this.height = 400,
     this.showBorder = false,
+    this.useOnlyWatch = false,
+    this.showMenuButtons = true,
+    this.darkMode = true,
+    this.flipScreen = false,
   });
 
   @override
@@ -56,6 +68,7 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
 
 class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget> {
   bool _showRsiScreen = false;
+  late final Future<void> _applyInitialOptionsFuture;
 
   void _toggleScreen() {
     setState(() {
@@ -64,59 +77,97 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
   }
 
   @override
+  void initState() {
+    super.initState();
+    _applyInitialOptionsFuture = _applyInitialOptionsToPrefs();
+  }
+
+  Future<void> _applyInitialOptionsToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('themeMode', widget.darkMode ? 'dark' : 'light');
+    await prefs.setBool('isFlipped', widget.flipScreen);
+    // Also update in-memory settings to avoid relying on a later reload
+    final desiredTheme = widget.darkMode ? ThemeMode.dark : ThemeMode.light;
+    final settingsNow = ref.read(settingsProvider);
+    final settingsNotifier = ref.read(settingsProvider.notifier);
+    if (settingsNow.themeMode != desiredTheme) {
+      await settingsNotifier.updateThemeMode(desiredTheme);
+    }
+    if (settingsNow.isFlipped != widget.flipScreen) {
+      await settingsNotifier.toggleFlipped();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final sharedPreferencesAsync = ref.watch(sharedPreferencesProvider);
 
     return sharedPreferencesAsync.when(
       data: (_) {
-        final settings = ref.watch(settingsProvider);
-        return Transform.rotate(
-          angle: settings.isFlipped ? pi : 0,
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Digital Clock',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: settings.themeMode,
-            home: Center(
-              child: Container(
-                width: widget.width,
-                height: _showRsiScreen ? max(widget.height, 480.0) : widget.height,
-                decoration: widget.showBorder
-                    ? BoxDecoration(
-                        border: Border.all(color: Colors.blue, width: 10),
-                      )
-                    : null,
-                child: _showRsiScreen
-                    ? Stack(
-                        children: [
-                          const CretaRSIMainScreen(),
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 4, right: 100.0),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.home_outlined,
-                                  color: Colors.white,
+        return FutureBuilder<void>(
+          future: _applyInitialOptionsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox.shrink();
+            }
+            final settings = ref.watch(settingsProvider);
+            return Transform.rotate(
+              angle: settings.isFlipped ? pi : 0,
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Digital Clock',
+                theme: widget.darkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+                darkTheme: widget.darkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+                themeMode: settings.themeMode,
+                home: Center(
+                  child: Container(
+                    width: max(widget.width, kMinWatchWidth),
+                    height: () {
+                      final effectiveWidth = max(widget.width, kMinWatchWidth);
+                      final computedHeight = effectiveWidth / kWatchAspectRatio;
+                      return _showRsiScreen && !widget.useOnlyWatch
+                          ? max(computedHeight, 480.0)
+                          : computedHeight;
+                    }(),
+                    decoration: widget.showBorder
+                        ? BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 10),
+                          )
+                        : null,
+                    child: _showRsiScreen && !widget.useOnlyWatch
+                        ? Stack(
+                            children: [
+                              const CretaRSIMainScreen(),
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 4, right: 100.0),
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.home_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    iconSize: 32.0,
+                                    onPressed: _toggleScreen,
+                                    tooltip: '뒤로가기',
+                                  ),
                                 ),
-                                iconSize: 32.0,
-                                onPressed: _toggleScreen,
-                                tooltip: '뒤로가기',
                               ),
-                            ),
+                            ],
+                          )
+                        : ClockPage(
+                            width: max(widget.width, kMinWatchWidth),
+                            height: max(widget.width, kMinWatchWidth) / kWatchAspectRatio,
+                            alarmTimes: widget.alarmTimes,
+                            onShowRsi: widget.useOnlyWatch ? () {} : _toggleScreen,
+                            useOnlyWatch: widget.useOnlyWatch,
+                            showMenuButtons: widget.showMenuButtons,
                           ),
-                        ],
-                      )
-                    : ClockPage(
-                        width: widget.width,
-                        height: widget.height,
-                        alarmTimes: widget.alarmTimes,
-                        onShowRsi: _toggleScreen,
-                      ),
+                  ),
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),

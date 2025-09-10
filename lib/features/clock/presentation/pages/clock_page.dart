@@ -10,9 +10,9 @@ import 'package:creta_device_watch/features/clock/domain/entities/clock_settings
 import 'package:creta_device_watch/features/settings/presentation/widgets/settings_controls.dart';
 import 'package:creta_device_watch/features/history/presentation/widgets/history_events_dialog.dart';
 import 'package:creta_device_watch/features/clock/presentation/widgets/alarm_video_player.dart';
-import 'package:creta_rsi/creta_rsi.dart';
-import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:creta_rsi/creta_rsi.dart';
+// import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
+// import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/pages/world_clock_page.dart';
 //import 'package:creta_device_watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 // ignore: unused_shown_name
@@ -25,6 +25,8 @@ class ClockPage extends ConsumerStatefulWidget {
   final double width;
   final double height;
   final VoidCallback onShowRsi;
+  final bool useOnlyWatch;
+  final bool showMenuButtons;
 
   const ClockPage({
     super.key,
@@ -32,6 +34,8 @@ class ClockPage extends ConsumerStatefulWidget {
     required this.width,
     required this.height,
     required this.onShowRsi,
+    this.useOnlyWatch = false,
+    this.showMenuButtons = true,
   });
 
   @override
@@ -188,6 +192,8 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           alarmTimes: _managedAlarmTimes,
           onAddAlarm: _addAlarm,
           onDeleteAlarm: _deleteAlarm,
+          useOnlyWatch: widget.useOnlyWatch,
+          showMenuButtons: widget.showMenuButtons,
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -254,6 +260,8 @@ class MainClockView extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
+  final bool useOnlyWatch;
+  final bool showMenuButtons;
 
   const MainClockView({
     super.key,
@@ -265,6 +273,8 @@ class MainClockView extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
+    this.useOnlyWatch = false,
+    this.showMenuButtons = true,
   });
 
   @override
@@ -278,7 +288,7 @@ class MainClockView extends ConsumerWidget {
         children: [
           if (isAlarmRinging)
             const AlarmVideoPlayer()
-          else if (settings.isWeatherEnabled)
+          else if (settings.isWeatherEnabled && !useOnlyWatch)
             const WeatherBackground(),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -295,20 +305,21 @@ class MainClockView extends ConsumerWidget {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      tooltip: '오늘 있었던 역사적 사건',
-                      icon: const Icon(Icons.history),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => HistoryEventsDialog(
-                            date: time,
-                            width: width,
-                            height: height,
-                          ),
-                        );
-                      },
-                    ),
+                    if (!useOnlyWatch)
+                      IconButton(
+                        tooltip: '오늘 있었던 역사적 사건',
+                        icon: const Icon(Icons.history),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => HistoryEventsDialog(
+                              date: time,
+                              width: width,
+                              height: height,
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 ),
                 loading: () => const SizedBox(height: 30),
@@ -325,16 +336,18 @@ class MainClockView extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               // Settings, Alarm, and Dismiss controls
-              SettingsControls(
-                isAlarmRinging: isAlarmRinging,
-                onDismissAlarm: onDismissAlarm,
-                onShowRsi: onShowRsi,
-                alarmTimes: alarmTimes,
-                onAddAlarm: onAddAlarm,
-                onDeleteAlarm: onDeleteAlarm,
-                width: width,
-                height: height,
-              ),
+              if (showMenuButtons)
+                SettingsControls(
+                  isAlarmRinging: isAlarmRinging,
+                  onDismissAlarm: onDismissAlarm,
+                  onShowRsi: onShowRsi,
+                  alarmTimes: alarmTimes,
+                  onAddAlarm: onAddAlarm,
+                  onDeleteAlarm: onDeleteAlarm,
+                  width: width,
+                  height: height,
+                  useOnlyWatch: useOnlyWatch,
+                ),
             ],
           ),
         ],
