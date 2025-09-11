@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
       showMenuButtons: false,
       showDate: false,
       useOnlyWatch: true,
-      width: 190,
+      width: 1920,
       darkMode: true,
       showSec: true,
       showBorder: false,
