@@ -27,6 +27,10 @@ class ClockPage extends ConsumerStatefulWidget {
   final VoidCallback onShowRsi;
   final bool useOnlyWatch;
   final bool showMenuButtons;
+  final bool showSec;
+  final Color? bgColor;
+  final Color? fgColor;
+  final Color? watchBgColor;
 
   const ClockPage({
     super.key,
@@ -36,6 +40,10 @@ class ClockPage extends ConsumerStatefulWidget {
     required this.onShowRsi,
     this.useOnlyWatch = false,
     this.showMenuButtons = true,
+    this.showSec = true,
+    this.bgColor,
+    this.fgColor,
+    this.watchBgColor,
   });
 
   @override
@@ -194,7 +202,9 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     final fitScale = scale <= heightScale ? scale : heightScale;
     final adjustedScale = widget.useOnlyWatch ? fitScale : (fitScale * 0.75);
     final pageContent = Scaffold(
-        backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
+        backgroundColor: _isAlarmRinging
+            ? Colors.red.withValues(alpha: 0.7)
+            : (widget.bgColor ?? Theme.of(context).scaffoldBackgroundColor),
         body: //clockView == ClockView.main          ?
             MainClockView(
           width: widget.width,
@@ -207,7 +217,10 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           onDeleteAlarm: _deleteAlarm,
           useOnlyWatch: widget.useOnlyWatch,
           showMenuButtons: widget.showMenuButtons,
+          showSec: widget.showSec,
           scale: adjustedScale.clamp(0.2, 3.0),
+          fgColor: widget.fgColor,
+          watchBgColor: widget.watchBgColor,
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -277,6 +290,9 @@ class MainClockView extends ConsumerWidget {
   final bool useOnlyWatch;
   final bool showMenuButtons;
   final double scale;
+  final bool showSec;
+  final Color? fgColor;
+  final Color? watchBgColor;
 
   const MainClockView({
     super.key,
@@ -291,6 +307,9 @@ class MainClockView extends ConsumerWidget {
     this.useOnlyWatch = false,
     this.showMenuButtons = true,
     this.scale = 1.0,
+    this.showSec = true,
+    this.fgColor,
+    this.watchBgColor,
   });
 
   @override
@@ -393,7 +412,9 @@ class MainClockView extends ConsumerWidget {
     final second = time.second;
 
     final brightness = Theme.of(context).brightness;
-    final textColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
+    final textColor = (fgColor != null)
+        ? fgColor!
+        : (brightness == Brightness.dark ? Colors.white : Colors.black87);
 
     final scale = (this.scale).clamp(0.03, 3.0);
     // Tune base digit sizes for new 1920:480 baseline so digits fill more width
@@ -403,7 +424,8 @@ class MainClockView extends ConsumerWidget {
       color: textColor,
       fontSize: digitHeight * 0.66,
     );
-    final digitBackgroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.8);
+    final digitBackgroundColor =
+        (watchBgColor ?? Theme.of(context).colorScheme.surface).withValues(alpha: 0.8);
     //final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return FittedBox(
@@ -470,25 +492,27 @@ class MainClockView extends ConsumerWidget {
             height: digitHeight,
             backgroundColor: digitBackgroundColor,
           ),
-          _buildSeparator(context, fontStyle),
-          // Second
-          FlipDigit(
-            initialValue: second ~/ 10,
-            stream: stream.map((t) => t.second ~/ 10).distinct(),
-            textStyle: textStyle,
-            width: digitWidth,
-            height: digitHeight,
-            backgroundColor: digitBackgroundColor,
-          ),
-          SizedBox(width: 8 * scale),
-          FlipDigit(
-            initialValue: second % 10,
-            stream: stream.map((t) => t.second % 10).distinct(),
-            textStyle: textStyle,
-            width: digitWidth,
-            height: digitHeight,
-            backgroundColor: digitBackgroundColor,
-          ),
+          if (showSec) ...[
+            _buildSeparator(context, fontStyle),
+            // Second
+            FlipDigit(
+              initialValue: second ~/ 10,
+              stream: stream.map((t) => t.second ~/ 10).distinct(),
+              textStyle: textStyle,
+              width: digitWidth,
+              height: digitHeight,
+              backgroundColor: digitBackgroundColor,
+            ),
+            SizedBox(width: 8 * scale),
+            FlipDigit(
+              initialValue: second % 10,
+              stream: stream.map((t) => t.second % 10).distinct(),
+              textStyle: textStyle,
+              width: digitWidth,
+              height: digitHeight,
+              backgroundColor: digitBackgroundColor,
+            ),
+          ],
         ],
       ),
     );

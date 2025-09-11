@@ -50,6 +50,10 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
   final bool showMenuButtons; // 하단 메뉴 표시 여부
   final bool darkMode; // 초기 다크 모드 여부
   final bool flipScreen; // 초기 화면 회전 여부(뒤집기)
+  final bool showSec; // 초 표시 여부
+  final Color? bgColor; // 전체 배경색
+  final Color? fgColor; // 폰트색
+  final Color? watchBgColor; // 시계 박스 배경색
 
   const CretaDeviceWatchWidget({
     super.key,
@@ -60,6 +64,10 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
     this.showMenuButtons = true,
     this.darkMode = true,
     this.flipScreen = false,
+    this.showSec = true,
+    this.bgColor,
+    this.fgColor,
+    this.watchBgColor,
   });
 
   @override
@@ -162,6 +170,10 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                             onShowRsi: widget.useOnlyWatch ? () {} : _toggleScreen,
                             useOnlyWatch: widget.useOnlyWatch,
                             showMenuButtons: widget.showMenuButtons,
+                            showSec: widget.showSec,
+                            bgColor: widget.bgColor,
+                            fgColor: widget.fgColor,
+                            watchBgColor: widget.watchBgColor,
                           ),
                   ),
                 ),

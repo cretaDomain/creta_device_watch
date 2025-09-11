@@ -39,6 +39,12 @@ class MyApp extends StatelessWidget {
       useOnlyWatch: true,
       width: 1920,
       darkMode: true,
+      showSec: true,
+      showBorder: true,
+      flipScreen: false,
+      watchBgColor: Colors.blue,
+      fgColor: Colors.red,
+      bgColor: Colors.white,
     );
   }
 }
