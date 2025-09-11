@@ -1,3 +1,5 @@
+## 1.1.7+7
+get rid of rsi
 ## 1.1.6+6
 google font downgrade
 ## 1.1.5+5

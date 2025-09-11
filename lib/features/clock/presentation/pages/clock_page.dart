@@ -341,8 +341,13 @@ class MainClockView extends ConsumerWidget {
                     Text(
                       DateFormat.yMMMMd('en_US').add_E().format(time),
                       style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontSize:
-                              (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) * scale),
+                            fontSize:
+                                (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) * scale,
+                            color: fgColor ??
+                                (Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black87),
+                          ),
                     ),
                     SizedBox(width: 8 * scale),
                     if (!useOnlyWatch)

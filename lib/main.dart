@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
+// import 'package:creta_rsi/presentation/riverpod/providers.dart' as rsi_providers;
 import 'package:creta_device_watch/creta_device_watch_widget.dart';
 // ignore: depend_on_referenced_packages
 //import 'package:creta_music_visualizer/music_visualizer.dart';
@@ -11,15 +11,8 @@ import 'package:creta_device_watch/creta_device_watch_widget.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final prefs = await SharedPreferences.getInstance();
-  final container = ProviderContainer(
-    overrides: [
-      rsi_providers.sharedPreferencesProvider.overrideWithValue(prefs),
-    ],
-  );
-
-  container.read(rsi_providers.settingsProvider.notifier).loadSettings();
-  container.read(rsi_providers.stockNotifierProvider.notifier).fetchStocks();
+  await SharedPreferences.getInstance();
+  final container = ProviderContainer();
 
   if (Platform.isWindows) {
     await windowManager.ensureInitialized();

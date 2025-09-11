@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:creta_rsi/creta_rsi.dart';
+// import 'package:creta_rsi/creta_rsi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -145,7 +145,7 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                     child: _showRsiScreen && !widget.useOnlyWatch
                         ? Stack(
                             children: [
-                              const CretaRSIMainScreen(),
+                              // const CretaRSIMainScreen(),
                               Align(
                                 alignment: Alignment.topRight,
                                 child: Padding(
