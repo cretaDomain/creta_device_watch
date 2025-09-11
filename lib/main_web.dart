@@ -29,11 +29,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CretaDeviceWatchWidget(
       showMenuButtons: false,
+      showDate: false,
       useOnlyWatch: true,
-      width: 1920,
+      width: 200,
       darkMode: true,
       showSec: true,
-      showBorder: true,
+      showBorder: false,
       flipScreen: false,
       watchBgColor: Colors.blue,
       fgColor: Colors.red,

@@ -54,6 +54,7 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
   final Color? bgColor; // 전체 배경색
   final Color? fgColor; // 폰트색
   final Color? watchBgColor; // 시계 박스 배경색
+  final bool showDate; // 날짜 표시 여부
 
   const CretaDeviceWatchWidget({
     super.key,
@@ -68,6 +69,7 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
     this.bgColor,
     this.fgColor,
     this.watchBgColor,
+    this.showDate = true,
   });
 
   @override
@@ -174,6 +176,7 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                             bgColor: widget.bgColor,
                             fgColor: widget.fgColor,
                             watchBgColor: widget.watchBgColor,
+                            showDate: widget.showDate,
                           ),
                   ),
                 ),

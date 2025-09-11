@@ -31,6 +31,7 @@ class ClockPage extends ConsumerStatefulWidget {
   final Color? bgColor;
   final Color? fgColor;
   final Color? watchBgColor;
+  final bool showDate;
 
   const ClockPage({
     super.key,
@@ -44,6 +45,7 @@ class ClockPage extends ConsumerStatefulWidget {
     this.bgColor,
     this.fgColor,
     this.watchBgColor,
+    this.showDate = true,
   });
 
   @override
@@ -221,6 +223,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
           scale: adjustedScale.clamp(0.2, 3.0),
           fgColor: widget.fgColor,
           watchBgColor: widget.watchBgColor,
+          showDate: widget.showDate,
         )
         // : WorldClockPage(
         //     onAddCity: () {
@@ -293,6 +296,7 @@ class MainClockView extends ConsumerWidget {
   final bool showSec;
   final Color? fgColor;
   final Color? watchBgColor;
+  final bool showDate;
 
   const MainClockView({
     super.key,
@@ -310,6 +314,7 @@ class MainClockView extends ConsumerWidget {
     this.showSec = true,
     this.fgColor,
     this.watchBgColor,
+    this.showDate = true,
   });
 
   @override
@@ -333,45 +338,47 @@ class MainClockView extends ConsumerWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              asyncTime.when(
-                data: (time) => Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      DateFormat.yMMMMd('en_US').add_E().format(time),
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontSize:
-                                (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) * scale,
-                            color: fgColor ??
-                                (Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black87),
-                          ),
-                    ),
-                    SizedBox(width: 8 * scale),
-                    if (!useOnlyWatch)
-                      IconButton(
-                        tooltip: '오늘 있었던 역사적 사건',
-                        icon: const Icon(Icons.history),
-                        iconSize: 24 * scale,
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => HistoryEventsDialog(
-                              date: time,
-                              width: width,
-                              height: height,
+              if (showDate)
+                asyncTime.when(
+                  data: (time) => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        DateFormat.yMMMMd('en_US').add_E().format(time),
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontSize:
+                                  (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) *
+                                      scale,
+                              color: fgColor ??
+                                  (Theme.of(context).brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black87),
                             ),
-                          );
-                        },
                       ),
-                  ],
+                      SizedBox(width: 8 * scale),
+                      if (!useOnlyWatch)
+                        IconButton(
+                          tooltip: '오늘 있었던 역사적 사건',
+                          icon: const Icon(Icons.history),
+                          iconSize: 24 * scale,
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => HistoryEventsDialog(
+                                date: time,
+                                width: width,
+                                height: height,
+                              ),
+                            );
+                          },
+                        ),
+                    ],
+                  ),
+                  loading: () => SizedBox(height: 30 * scale),
+                  error: (err, stack) => const Text('Error'),
                 ),
-                loading: () => SizedBox(height: 30 * scale),
-                error: (err, stack) => const Text('Error'),
-              ),
-              SizedBox(height: 20 * scale),
+              if (showDate) SizedBox(height: 20 * scale),
               // Flip Clock
               asyncTime.when(
                 data: (time) => _buildClockDisplay(context, time,
