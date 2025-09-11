@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
-import 'package:creta_device_watch/core/api/api_key.dart';
+import 'package:creta_device_watch/core/api/api_key_sample.dart';
 import 'package:creta_device_watch/features/weather/data/datasources/weather_remote_data_source.dart';
 import 'package:creta_device_watch/features/weather/data/models/weather_model.dart';
 

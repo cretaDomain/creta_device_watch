@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:creta_device_watch/core/api/api_key.dart';
+import 'package:creta_device_watch/core/api/api_key_sample.dart';
 import 'package:creta_device_watch/features/weather/data/models/weather_model.dart';
 
 abstract class WeatherRemoteDataSource {
