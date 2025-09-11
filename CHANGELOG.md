@@ -1,3 +1,5 @@
+## 1.1.6+6
+google font downgrade
 ## 1.1.5+5
 window manager version up
 ## 1.1.4+4
