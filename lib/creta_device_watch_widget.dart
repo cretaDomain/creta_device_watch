@@ -8,6 +8,7 @@ import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:creta_device_watch/core/di/provider.dart';
 import 'package:creta_device_watch/features/clock/presentation/pages/clock_page.dart';
+import 'package:creta_device_watch/features/clock/presentation/notifiers/time_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/app_theme.dart';
@@ -121,6 +122,9 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
               return const SizedBox.shrink();
             }
             final settings = ref.watch(settingsProvider);
+            // Minimal mode: if width < 200, render only time text over background
+            final isMinimalMode = widget.width < 200;
+            final timeAsync = ref.watch(timeNotifierProvider);
             return Transform.rotate(
               angle: settings.isFlipped ? pi : 0,
               child: MaterialApp(
@@ -129,56 +133,98 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                 theme: widget.darkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
                 darkTheme: widget.darkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
                 themeMode: settings.themeMode,
-                home: Center(
-                  child: Container(
-                    width: widget.width,
-                    height: () {
-                      final effectiveWidth = widget.width;
-                      final computedHeight = effectiveWidth / kWatchAspectRatio;
-                      return _showRsiScreen && !widget.useOnlyWatch
-                          ? max(computedHeight, 480.0)
-                          : computedHeight;
-                    }(),
-                    decoration: widget.showBorder
-                        ? BoxDecoration(
-                            border: Border.all(color: Colors.blue, width: 10),
-                          )
-                        : null,
-                    child: _showRsiScreen && !widget.useOnlyWatch
-                        ? Stack(
-                            children: [
-                              // const CretaRSIMainScreen(),
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 4, right: 100.0),
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.home_outlined,
-                                      color: Colors.white,
+                home: Builder(
+                  builder: (context) {
+                    final background = widget.bgColor ?? Theme.of(context).scaffoldBackgroundColor;
+                    if (isMinimalMode) {
+                      final width = widget.width;
+                      final height = width / kWatchAspectRatio;
+                      return Container(
+                        color: background,
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                          width: width,
+                          height: height,
+                          child: Center(
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: timeAsync.when(
+                                data: (now) {
+                                  String two(int n) => n.toString().padLeft(2, '0');
+                                  final text =
+                                      '${two(now.hour)}:${two(now.minute)}:${two(now.second)}';
+                                  return Text(
+                                    text,
+                                    style: TextStyle(
+                                      color: widget.fgColor ??
+                                          (Theme.of(context).brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black87),
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    iconSize: 32.0,
-                                    onPressed: _toggleScreen,
-                                    tooltip: '뒤로가기',
-                                  ),
-                                ),
+                                  );
+                                },
+                                loading: () => const Text('..:..:..'),
+                                error: (e, _) => const Text('--:--:--'),
                               ),
-                            ],
-                          )
-                        : ClockPage(
-                            width: widget.width,
-                            height: widget.width / kWatchAspectRatio,
-                            alarmTimes: widget.alarmTimes,
-                            onShowRsi: widget.useOnlyWatch ? () {} : _toggleScreen,
-                            useOnlyWatch: widget.useOnlyWatch,
-                            showMenuButtons: widget.showMenuButtons,
-                            showSec: widget.showSec,
-                            bgColor: widget.bgColor,
-                            fgColor: widget.fgColor,
-                            watchBgColor: widget.watchBgColor,
-                            showDate: widget.showDate,
+                            ),
                           ),
-                  ),
+                        ),
+                      );
+                    }
+                    // Normal rich UI
+                    return Center(
+                      child: Container(
+                        width: widget.width,
+                        height: () {
+                          final effectiveWidth = widget.width;
+                          final computedHeight = effectiveWidth / kWatchAspectRatio;
+                          return _showRsiScreen && !widget.useOnlyWatch
+                              ? max(computedHeight, 480.0)
+                              : computedHeight;
+                        }(),
+                        decoration: widget.showBorder
+                            ? BoxDecoration(
+                                border: Border.all(color: Colors.blue, width: 10),
+                              )
+                            : null,
+                        child: _showRsiScreen && !widget.useOnlyWatch
+                            ? Stack(
+                                children: [
+                                  // const CretaRSIMainScreen(),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 4, right: 100.0),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.home_outlined,
+                                          color: Colors.white,
+                                        ),
+                                        iconSize: 32.0,
+                                        onPressed: _toggleScreen,
+                                        tooltip: '뒤로가기',
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : ClockPage(
+                                width: widget.width,
+                                height: widget.width / kWatchAspectRatio,
+                                alarmTimes: widget.alarmTimes,
+                                onShowRsi: widget.useOnlyWatch ? () {} : _toggleScreen,
+                                useOnlyWatch: widget.useOnlyWatch,
+                                showMenuButtons: widget.showMenuButtons,
+                                showSec: widget.showSec,
+                                bgColor: widget.bgColor,
+                                fgColor: widget.fgColor,
+                                watchBgColor: widget.watchBgColor,
+                                showDate: widget.showDate,
+                              ),
+                      ),
+                    );
+                  },
                 ),
               ),
             );
