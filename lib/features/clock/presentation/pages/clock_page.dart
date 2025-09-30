@@ -253,7 +253,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
                     _overlayTimer?.cancel();
                   }
                 },
-                child: _showWebAudioMessage
+                child: _showWebAudioMessage && widget.useOnlyWatch == false
                     ? Align(
                         alignment: Alignment.bottomCenter,
                         child: SizedBox(
