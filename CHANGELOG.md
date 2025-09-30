@@ -1,3 +1,5 @@
+## 1.2.1+10
+useOnlyWatch
 ## 1.2.0+10
 hangul message error
 ## 1.1.9+9

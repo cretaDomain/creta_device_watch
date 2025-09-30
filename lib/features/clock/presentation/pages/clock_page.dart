@@ -67,7 +67,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
   void initState() {
     super.initState();
     _managedAlarmTimes = List<String>.from(widget.alarmTimes ?? []);
-    if (_showWebAudioMessage) {
+    if (_showWebAudioMessage && widget.useOnlyWatch == false) {
       _overlayTimer = Timer(const Duration(seconds: 7), () {
         if (mounted) {
           setState(() {
@@ -76,10 +76,12 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         }
       });
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _parseAlarmTime();
-      _setupAlarmListener();
-    });
+    if (widget.useOnlyWatch == false) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _parseAlarmTime();
+        _setupAlarmListener();
+      });
+    }
   }
 
   @override
@@ -238,7 +240,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     return Stack(
       children: [
         //if (settings.isWeatherEnabled) const WeatherBackground(),
-        if (!_isWebAudioReady)
+        if (!_isWebAudioReady && widget.useOnlyWatch == false)
           Positioned.fill(
             child: LayoutBuilder(builder: (context, constraints) {
               final bodyHeight = constraints.maxHeight - MediaQuery.of(context).padding.top;
