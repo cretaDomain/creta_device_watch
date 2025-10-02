@@ -28,9 +28,9 @@ class ClockPage extends ConsumerStatefulWidget {
   final bool useOnlyWatch;
   final bool showMenuButtons;
   final bool showSec;
-  final Color? bgColor;
-  final Color? fgColor;
-  final Color? watchBgColor;
+  final Color bgColor;
+  final Color fgColor;
+  final Color watchBgColor;
   final bool showDate;
 
   const ClockPage({
@@ -42,9 +42,9 @@ class ClockPage extends ConsumerStatefulWidget {
     this.useOnlyWatch = false,
     this.showMenuButtons = true,
     this.showSec = true,
-    this.bgColor,
-    this.fgColor,
-    this.watchBgColor,
+    this.bgColor = Colors.transparent,
+    this.fgColor = Colors.white,
+    this.watchBgColor = Colors.black,
     this.showDate = true,
   });
 
@@ -206,9 +206,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     final fitScale = scale <= heightScale ? scale : heightScale;
     final adjustedScale = widget.useOnlyWatch ? fitScale : (fitScale * 0.75);
     final pageContent = Scaffold(
-        backgroundColor: _isAlarmRinging
-            ? Colors.red.withValues(alpha: 0.7)
-            : (widget.bgColor ?? Theme.of(context).scaffoldBackgroundColor),
+        backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : widget.bgColor,
         body: //clockView == ClockView.main          ?
             MainClockView(
           width: widget.width,
@@ -296,8 +294,8 @@ class MainClockView extends ConsumerWidget {
   final bool showMenuButtons;
   final double scale;
   final bool showSec;
-  final Color? fgColor;
-  final Color? watchBgColor;
+  final Color fgColor;
+  final Color watchBgColor;
   final bool showDate;
 
   const MainClockView({
@@ -314,8 +312,8 @@ class MainClockView extends ConsumerWidget {
     this.showMenuButtons = true,
     this.scale = 1.0,
     this.showSec = true,
-    this.fgColor,
-    this.watchBgColor,
+    this.fgColor = Colors.white,
+    this.watchBgColor = Colors.black,
     this.showDate = true,
   });
 
@@ -352,10 +350,7 @@ class MainClockView extends ConsumerWidget {
                               fontSize:
                                   (Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24) *
                                       scale,
-                              color: fgColor ??
-                                  (Theme.of(context).brightness == Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black87),
+                              color: fgColor,
                             ),
                       ),
                       SizedBox(width: 8 * scale),
@@ -425,10 +420,8 @@ class MainClockView extends ConsumerWidget {
     final minute = time.minute;
     final second = time.second;
 
-    final brightness = Theme.of(context).brightness;
-    final textColor = (fgColor != null)
-        ? fgColor!
-        : (brightness == Brightness.dark ? Colors.white : Colors.black87);
+    //final brightness = Theme.of(context).brightness;
+    final textColor = fgColor;
 
     final scale = (this.scale).clamp(0.03, 3.0);
     // Tune base digit sizes for new 1920:480 baseline so digits fill more width
@@ -438,8 +431,9 @@ class MainClockView extends ConsumerWidget {
       color: textColor,
       fontSize: digitHeight * 0.66,
     );
-    final digitBackgroundColor =
-        (watchBgColor ?? Theme.of(context).colorScheme.surface).withValues(alpha: 0.8);
+    // final digitBackgroundColor =
+    //     (watchBgColor ?? Theme.of(context).colorScheme.surface).withValues(alpha: 0.8);
+    final digitBackgroundColor = watchBgColor;
     //final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return FittedBox(

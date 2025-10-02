@@ -1,3 +1,5 @@
+## 1.2.2+10
+default color
 ## 1.2.1+10
 useOnlyWatch
 ## 1.2.0+10

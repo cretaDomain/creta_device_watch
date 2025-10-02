@@ -52,9 +52,9 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
   final bool darkMode; // 초기 다크 모드 여부
   final bool flipScreen; // 초기 화면 회전 여부(뒤집기)
   final bool showSec; // 초 표시 여부
-  final Color? bgColor; // 전체 배경색
-  final Color? fgColor; // 폰트색
-  final Color? watchBgColor; // 시계 박스 배경색
+  final Color bgColor; // 전체 배경색
+  final Color fgColor; // 폰트색
+  final Color watchBgColor; // 시계 박스 배경색
   final bool showDate; // 날짜 표시 여부
 
   const CretaDeviceWatchWidget({
@@ -67,9 +67,9 @@ class CretaDeviceWatchWidget extends ConsumerStatefulWidget {
     this.darkMode = true,
     this.flipScreen = false,
     this.showSec = true,
-    this.bgColor,
-    this.fgColor,
-    this.watchBgColor,
+    this.bgColor = Colors.transparent,
+    this.fgColor = Colors.white,
+    this.watchBgColor = Colors.black,
     this.showDate = true,
   });
 
@@ -135,7 +135,7 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                 themeMode: settings.themeMode,
                 home: Builder(
                   builder: (context) {
-                    final background = widget.bgColor ?? Theme.of(context).scaffoldBackgroundColor;
+                    final background = widget.bgColor;
                     if (isMinimalMode) {
                       final width = widget.width;
                       final height = width / kWatchAspectRatio;
@@ -156,10 +156,7 @@ class _CretaDeviceWatchWidgetState extends ConsumerState<CretaDeviceWatchWidget>
                                   return Text(
                                     text,
                                     style: TextStyle(
-                                      color: widget.fgColor ??
-                                          (Theme.of(context).brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black87),
+                                      color: widget.fgColor,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
